@@ -1,0 +1,103 @@
+const { MongoClient } = require("mongodb");
+
+require("dotenv").config();
+const { MONGO_URI } = process.env;
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+
+const { v4: uuidv4 } = require("uuid");
+
+//.................................................................................//
+//STUDENT ROUTES                                                                   //
+//.................................................................................//
+
+//GET ALL STUDENTS
+const getAllStudents = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//GET STUDENTS BY ID
+const getStudentById = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//GET STUDENTS BY CLASSROOM
+const getStudentsByClassroom = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//ADD STUDENTS (POST)
+//BODY:[{...},{...},{...},{
+//givenName,
+//surName,
+//classroomId
+//}]
+const addNewStudent = async (req, res) => {
+  const { allStudentsArray } = req.body;
+  console.log(allStudentsArray);
+  UpdatedStudentArray = allStudentsArray.map((studentObject) => {
+    console.log(givenName, surname, classroomId);
+    const username = givenName.substr(0, 2).concat("_", surname.substr(0, 2));
+    studentObject.username = username;
+    studentObject.password = Math.random.toString(36).slice(-6);
+    studentObject.booksCheckedOut = [];
+    studentObject.waitingList = [];
+  });
+  console.log(UpdatedStudentArray);
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//DELETE STUDENT (DELETE)
+const deleteStudentById = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+module.exports = {
+  getAllStudents,
+  getStudentById,
+  getStudentsByClassroom,
+  addNewStudent,
+  deleteStudentById,
+};

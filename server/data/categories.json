@@ -1,0 +1,47 @@
+{
+  "_id": "Std_categories_booknook",
+  "type": ["Fiction", "Non-Fiction"],
+  "fiction": [
+    "Action and Adventure",
+    "Comic",
+    "Classics",
+    "Fantasy",
+    "Poetry",
+    "Mystery"
+  ],
+  "subjects": [
+    "Science",
+    "Math",
+    "Nature",
+    "Art",
+    "ERC",
+    "Social Studies",
+    "Music"
+  ],
+  "holidays": [
+    "Christmas",
+    "Easter",
+    "Valentines Day",
+    "Halloween",
+    "St. Patrick's Day",
+    "Father's Day",
+    "Mother's Day",
+    "Hunukkah"
+  ],
+  "ageGroup": [
+    "0-3 years",
+    "3-5 years",
+    "5-7 years",
+    "7-9 years",
+    "9-12 years"
+  ],
+  "gradeLevel": [
+    "kindergarten",
+    "Grade 1",
+    "Grade 2",
+    "Grade 3",
+    "Grade 4",
+    "Grade 5",
+    "Grade 6"
+  ]
+}

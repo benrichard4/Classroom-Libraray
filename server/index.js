@@ -1,4 +1,4 @@
-const path = require("path");
+//const path = require("path");
 const morgan = require("morgan");
 const express = require("express");
 
@@ -8,9 +8,11 @@ express()
   .use(morgan("tiny"))
   .use(express.json())
 
-  .get("/hello", (req, res) => {
-    res.status(200).json({ hi: "hi" });
-  })
+  //routes
+  .use(require("./routes/teachers"))
+  .use(require("./routes/students"))
+  .use(require("./routes/libraries"))
+  .use(require("./routes/classrooms"))
 
   .get("*", (req, res) => {
     res.status(404).json({
