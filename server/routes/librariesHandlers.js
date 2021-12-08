@@ -137,7 +137,7 @@ const addLibrary = async (req, res) => {
   }
 };
 
-//ADD LIBRARY WITH PUT (ADD BOOKS USING GOOGLE API )
+//ADD book to library
 //BODY:{
 //bookIsbn,
 //categories,
@@ -198,6 +198,49 @@ const addBookToLibrary = async (req, res) => {
         });
       }
     }
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//REMOVE BOOK FROM LIBRARY:
+//body: {bookIsbn}
+const removeBookFromLibrary = async (req, res) => {
+  const isbn = req.body.bookIsbn;
+  const { _id } = req.params;
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    //findlibrary and get object for book. check if it is checked out. If checked out, throw error, can only delete book if all copies are checked in.
+    const foundLibrary = await db.collection("Libraries").findOne({ _id });
+
+    //get book Object from library
+    const foundBookArray = foundLibrary.library.filter((book) => {
+      return book.bookIsbn === isbn;
+    });
+    const foundBookObject = foundBookArray[0];
+    anyCheckedOut = foundBookObject.isCheckedout.some((element) => {
+      return element;
+    });
+    console.log(anyCheckedOut);
+    if (anyCheckedOut) {
+      res.status(400).json({
+        status: 400,
+        errorMsg: "Must check in all books before deleting",
+      });
+    } else {
+      await db
+        .collection("Libraries")
+        .updateOne({ _id }, { $pull: { library: { bookIsbn: isbn } } });
+
+      res
+        .status(200)
+        .json({ status: 200, message: `Book deleted: isbn${isbn}` });
+    }
+
     client.close();
   } catch (e) {
     console.log(e);
@@ -311,18 +354,75 @@ const checkoutBook = async (req, res) => {
 };
 
 //PATCH CHECKIN BOOK
-
+//body:{
+//bookIsbn,
+//student_id
+//}
 const checkinBook = async (req, res) => {
   const { _id } = req.params;
+  const { student_id } = req.body;
+  const isbn = req.body.bookIsbn;
   const client = new MongoClient(MONGO_URI, options);
   await client.connect();
   try {
     const db = client.db("ClassLibrary");
     const foundLibrary = await db.collection("Libraries").findOne({ _id });
+
     if (foundLibrary) {
-      res
-        .status(200)
-        .json({ status: 200, data: foundLibrary, message: "Libraries found" });
+      //get book Object from library
+      const foundBookArray = foundLibrary.library.filter((book) => {
+        return book.bookIsbn === isbn;
+      });
+      const foundBookObject = foundBookArray[0];
+      //find index of student id in checkedOutBy field
+      const indexOfStudentId = foundBookObject.checkedOutBy.indexOf(student_id);
+      //update the key value pairs for new book object
+
+      let newQtyAvailable = foundBookObject.qtyAvailable + 1;
+      let newIsCheckedoutArray = foundBookObject.isCheckedout;
+      let newCheckedOutByArray = foundBookObject.checkedOutBy;
+      let newCheckedOutDateArray = foundBookObject.checkedOutDate;
+      let newReturnDateArray = foundBookObject.returnDate;
+
+      //replace the relavent instance of true with false
+      newIsCheckedoutArray[indexOfStudentId] = false;
+      //set relavent instances of checkedoutby and dates to null
+      newCheckedOutByArray[indexOfStudentId] = null;
+      newCheckedOutDateArray[indexOfStudentId] = null;
+      newReturnDateArray[indexOfStudentId] = null;
+
+      //change value in the libraries collection
+      const updatedBookObject = {
+        ...foundBookObject,
+        qtyAvailable: newQtyAvailable,
+        isCheckedout: newIsCheckedoutArray,
+        checkedOutBy: newCheckedOutByArray,
+        checkedOutDate: newCheckedOutDateArray,
+        returnDate: newReturnDateArray,
+      };
+
+      //update book in library
+      await db
+        .collection("Libraries")
+        .updateOne(
+          { _id, "library.bookIsbn": foundBookObject.bookIsbn },
+          { $set: { "library.$": updatedBookObject } }
+        );
+      //remove book from books checked out list in student collection
+      //1st make an array with bookisbn and return date
+
+      await db
+        .collection("Students")
+        .updateOne(
+          { _id: student_id },
+          { $pull: { booksCheckedOut: { bookIsbn: isbn } } }
+        );
+
+      return res.status(200).json({
+        status: 200,
+        data: updatedBookObject,
+        message: "Book successfully checked in",
+      });
     } else {
       res
         .status(400)
@@ -369,6 +469,7 @@ module.exports = {
   getLibraryById,
   addLibrary,
   addBookToLibrary,
+  removeBookFromLibrary,
   checkoutBook,
   checkinBook,
   addToWaitingList,

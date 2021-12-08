@@ -8,6 +8,7 @@ const {
   getLibraryById,
   addLibrary,
   addBookToLibrary,
+  removeBookFromLibrary,
   checkoutBook,
   checkinBook,
   addToWaitingList,
@@ -21,9 +22,10 @@ const {
 router.get("/libraries", getAllLibraries); //get all libraries
 router.get("/libraries/:_id", getLibraryById); //get libraries by id
 router.post("/libraries", addLibrary); //post a new libaray to collection (BODY: _id (uuid4), teacher_id, name, library (empty array to start).
-router.put("/libraries/:_id", addBookToLibrary); //modify existing library by adding book (typically for updating the library key) BODY( book_isbn, categories_id, isCheckedOut (false to start), checkedOutBy (empty array to start), checkedOutDate(empty array to start), returnData(empty array to start), waitingLiost, qtyAvailably )
-router.patch("/libraries/:_id/checkout", checkoutBook); //for checking out books
-router.patch("/libraries/:_id/checkin", checkinBook); //for checking in books
+router.put("/libraries/:_id/addBook", addBookToLibrary); //modify existing library by adding book (typically for updating the library key) BODY( book_isbn, categories_id, isCheckedOut (false to start), checkedOutBy (empty array to start), checkedOutDate(empty array to start), returnData(empty array to start), waitingLiost, qtyAvailably )
+router.patch("/libraries/:_id/removeBook", removeBookFromLibrary); //body: {isbn}
+router.patch("/libraries/:_id/checkout", checkoutBook); //for checking out books. body:{isbn, student_id}
+router.patch("/libraries/:_id/checkin", checkinBook); //for checking in books. body:{isbn, student_id}
 router.patch("/libraries/:_id/waitingList", addToWaitingList); //for adding student to waiting list
 router.patch("/libraries/:_id/increaseQty", changeQty); //for increasing AvailableQty of book existing
 router.delete("/libraries/:id", deleteLibrary); // delete a library from a collection by id
