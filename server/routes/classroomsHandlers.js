@@ -53,9 +53,10 @@ const getClassroomsById = async (req, res) => {
         message: "Classroom found",
       });
     } else {
-      res
-        .status(400)
-        .json({ status: 400, ErrorMsg: "no Libraries found in db" });
+      res.status(400).json({
+        status: 400,
+        ErrorMsg: "no classroom found in db with given id",
+      });
     }
     client.close();
   } catch (e) {
@@ -117,7 +118,7 @@ const addNewClassroom = async (req, res) => {
 
     if (teacherExists && uniqueName) {
       //add classroom to Libraries collection
-      await db.collection("Classroom").insertOne(newClassroomObject);
+      await db.collection("Classrooms").insertOne(newClassroomObject);
       //add classroom to teacher's classroom list
       const newClassroomIdentifierObject = { _id: id, name: req.body.name };
       await db

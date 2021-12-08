@@ -120,44 +120,49 @@ const postNewTeacher = async (req, res) => {
   }
 };
 
-//ADD NEW LIBRARY (PATCH) (DONE IN LIBRARY ROUTES)
-// const addNewLibrary = async (req, res) => {
-//   const client = new MongoClient(MONGO_URI, options);
-//   await client.connect();
-//   try {
-//     const db = client.db("ClassLibrary");
-//     client.close();
-//   } catch (e) {
-//     console.log(e);
-//     client.close();
-//   }
-// };
-
-//ADD NEW CLASSROOM (PATCH) (DONE IN CLASSROOM ROUTES)
-// const addNewClassroom = async (req, res) => {
-//   const client = new MongoClient(MONGO_URI, options);
-//   await client.connect();
-//   try {
-//     const db = client.db("ClassLibrary");
-//     client.close();
-//   } catch (e) {
-//     console.log(e);
-//     client.close();
-//   }
-// };
-
-//!!NEED TO MODIFY TO TAKE INTO ACCOUTN DELETEING LIBRARIES AND CLASSROOM ASSOCIATED WITH TEACHER
 //DELETE TEACHER BY EMAIL(DELETE)
 const deleteTeacher = async (req, res) => {
   const { email } = req.params;
-  console.log(email);
   const client = new MongoClient(MONGO_URI, options);
 
   await client.connect();
   try {
     const db = client.db("ClassLibrary");
+
+    //delete classrooms and students associated to teacher
+    const teachersClassrooms = await db
+      .collection("Classrooms")
+      .find({ teacherEmail: email })
+      .toArray();
+
+    //create arrays of all classroom Ids and studentIds related to teacher
+    const studentsToDelete = [];
+    const classroomsToDelete = [];
+    teachersClassrooms.forEach((classroom) => {
+      classroomsToDelete.push(classroom._id);
+      if (classroom.classList.length > 0) {
+        classroom.classList.forEach((student) => {
+          studentsToDelete.push(student._id);
+        });
+      }
+    });
+
+    //delete each student that was in that array
+    await db
+      .collection("Students")
+      .deleteMany({ _id: { $in: studentsToDelete } });
+
+    //delete each classroom that was in that array
+    await db
+      .collection("Classrooms")
+      .deleteMany({ _id: { $in: classroomsToDelete } });
+
+    //delete libraries associated to teacher
+    await db.collection("Libraries").deleteMany({ teacherEmail: email });
+
+    //delete teacher from collections "teachers"
     const deletedTeacher = await db.collection("Teachers").deleteOne({ email });
-    console.log(deletedTeacher);
+
     deletedTeacher.deletedCount > 0
       ? res
           .status(200)
@@ -166,7 +171,7 @@ const deleteTeacher = async (req, res) => {
           status: 404,
           errorMsg: `no teacher found with email: ${email}`,
         });
-
+    console.log("woopsie");
     client.close();
   } catch (e) {
     console.log(e);

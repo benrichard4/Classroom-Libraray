@@ -205,88 +205,101 @@ const addBookToLibrary = async (req, res) => {
   }
 };
 
-//PATCH CHECKOUT BOOK (TYPICALLY FOR MODIFYING BOOKS: CHECKIN/OUT)
-//(in body: bookObject:{
-//bookIsbn,
-//categories,
-//waitingList,
-//qtyAvailable,
-//isCheckedOut,
-//checkedOutBy,
-//checkedOutDate,
-//returnDate,
-//}, student_id)
+//PATCH CHECKOUT BOOK (FOR MODIFYING BOOKS: CHECKIN/OUT)
+//(in body: {
+//isbn,
+//student_id}
 const checkoutBook = async (req, res) => {
   const { _id } = req.params;
-  const { bookObject, student_id } = req.body;
+  const { student_id } = req.body;
+  const isbn = req.body.bookIsbn;
   const client = new MongoClient(MONGO_URI, options);
-  let newQtyAvailable = bookObject.qtyAvailable - 1;
-  let newisCheckedOut = await client.connect();
+  await client.connect();
   try {
     const db = client.db("ClassLibrary");
     const foundLibrary = await db.collection("Libraries").findOne({ _id });
+    console.log(foundLibrary);
     if (foundLibrary) {
       //does book exist in library? If it does make the change, if not push error
       const foundBook = await db
         .collection("Libraries")
-        .findOne({ _id, "library.bookIsbn": bookIsbn }, { "bookIsbn.$": 1 });
-      console.log(foundBook);
-      if (foundBook) {
-        //check if there are any copies of books left to checkout (if index !== -1, then there is still an available copy)
-        const indexOfFalse = foundBook.library[0].isCheckedout.indexOf(false);
+        .findOne({ _id, "library.bookIsbn": isbn }); //, { "library.$": 1 });
+      console.log("foundbook", foundBook);
 
-        if (indexOfFalse !== -1) {
+      //get book Object from library
+      const foundBookArray = foundLibrary.library.filter((book) => {
+        return book.bookIsbn === isbn;
+      });
+      console.log(foundBookArray);
+      const foundBookObject = foundBookArray[0];
+
+      if (foundBook) {
+        // check if there are any copies of books left to checkout
+        if (foundBookObject.qtyAvailable >= 1) {
           //get value of new checkedout array and set it in the book
-          let newIsCheckedoutArray = foundBook.library[0].isCheckedout;
+          let newQtyAvailable = foundBookObject.qtyAvailable - 1;
+          let newIsCheckedoutArray = foundBookObject.isCheckedout;
+          let newCheckedOutByArray = foundBookObject.checkedOutBy;
+          let newCheckedOutDateArray = foundBookObject.checkedOutDate;
+          let newReturnDateArray = foundBookObject.returnDate;
+          //get index of first false
+          const indexOfFalse = foundBookObject.isCheckedout.indexOf(false);
+          //replace the first instance of false with true in all new arrays
           newIsCheckedoutArray[indexOfFalse] = true;
-          console.log("newIsCheckedoutArray", newIsCheckedoutArray);
+          newCheckedOutByArray[indexOfFalse] = student_id;
+          //set dates for checkin and return
           todaysDate = new Date();
           oneWeekFromNow = new Date();
-
           oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-          console.log("today", todaysDate, "one week from now", oneWeekFromNow);
+          //update date specific arrays
+          newCheckedOutDateArray[indexOfFalse] = todaysDate.toISOString();
+          newReturnDateArray[indexOfFalse] = oneWeekFromNow.toISOString();
           //change value in the libraries collection
+          const updatedBookObject = {
+            ...foundBookObject,
+            qtyAvailable: newQtyAvailable,
+            isCheckedout: newIsCheckedoutArray,
+            checkedOutBy: newCheckedOutByArray,
+            checkedOutDate: newCheckedOutDateArray,
+            returnDate: newReturnDateArray,
+          };
+          console.log(updatedBookObject);
+          //update book in library
           await db
             .collection("Libraries")
             .updateOne(
-              { _id, "library.bookIsbn": bookIsbn },
-              { $set: { "library.$.isCheckedOut": newIsCheckedoutArray } }
+              { _id, "library.bookIsbn": foundBookObject.bookIsbn },
+              { $set: { "library.$": updatedBookObject } }
             );
+          //add book to books checked out list in student collection
+          //1st make an array with bookisbn and return date
+          const studentCheckedOutObject = {
+            bookIsbn: foundBookObject.bookIsbn,
+            returnDate: newReturnDateArray[indexOfFalse],
+          };
           await db
-            .collection("Libraries")
+            .collection("Students")
             .updateOne(
-              { _id, "library.bookIsbn": bookIsbn },
-              { $set: { "library.$.checkedOutBy": student_id } }
+              { _id: student_id },
+              { $push: { booksCheckedOut: studentCheckedOutObject } }
             );
-          await db
-            .collection("Libraries")
-            .updateOne(
-              { _id, "library.bookIsbn": bookIsbn },
-              { $set: { "library.$.checkedOutDate": todaysDate } }
-            );
-          await db
-            .collection("Libraries")
-            .updateOne(
-              { _id, "library.bookIsbn": bookIsbn },
-              { $set: { "library.$.returnDate": oneWeekFromNow } }
-            );
-          //TODO: ADD CHECKEDOUT BOOK TO AND DATES TO STUDENT
-          res.status(200).json({ status: 200, data });
-        } else {
-          return res.status(404).json({
-            status: 404,
-            errorMsg:
-              "No more books under this title remaining to be checked out. Add name to waiting list",
+          return res.status(200).json({
+            status: 200,
+            data: updatedBookObject,
+            message: "Book successfully checked out",
           });
+        } else {
+          return res
+            .status(400)
+            .json({ status: 400, errorMsg: "No more books to checkout" });
         }
       } else {
-        return res.status(404).json({
-          status: 404,
-          errorMsg: "The book you were looking for was not found",
-        });
+        return res
+          .status(400)
+          .json({ status: 400, errorMsg: "Book ISBN not found!" });
       }
     } else {
-      return res
+      res
         .status(400)
         .json({ status: 400, errorMsg: "no Libraries found in db" });
     }
@@ -297,7 +310,8 @@ const checkoutBook = async (req, res) => {
   }
 };
 
-//PATCH CHECKIN BOOK (TYPICALLY FOR MODIFYING BOOKS: CHECKIN/OUT)
+//PATCH CHECKIN BOOK
+
 const checkinBook = async (req, res) => {
   const { _id } = req.params;
   const client = new MongoClient(MONGO_URI, options);
