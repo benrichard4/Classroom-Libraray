@@ -1,12 +1,14 @@
 //const path = require("path");
 const morgan = require("morgan");
 const express = require("express");
+const cors = require("cors");
 
 const PORT = 8000;
 
 express()
   .use(morgan("tiny"))
   .use(express.json())
+  .use(cors())
 
   //routes
   .use(require("./routes/teachers"))

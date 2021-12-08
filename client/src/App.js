@@ -5,6 +5,12 @@ import GlobalStyles from "./component/GlobalStyles";
 import Header from "./component/Header";
 import HomePage from "./component/HomePage";
 import TeacherMainPage from "./component/TeacherMainPage";
+import Classrooms from "./component/Classrooms";
+import Libraries from "./component/Libraries";
+import BookCheckout from "./component/BookCheckout";
+import BookReturn from "./component/BookReturn";
+import CreateClassroom from "./component/CreateClassroom";
+import CreateLibrary from "./component/CreateLibrary";
 
 const App = () => {
   return (
@@ -18,6 +24,24 @@ const App = () => {
           </Route>
           <Route exact path="/teacher">
             <TeacherMainPage />
+          </Route>
+          <Route exact path="/createclassroom">
+            <CreateClassroom />
+          </Route>
+          <Route exact path="/createlibrary">
+            <CreateLibrary />
+          </Route>
+          <Route exact path="/classrooms">
+            <Classrooms />
+          </Route>
+          <Route exact path="/libraries">
+            <Libraries />
+          </Route>
+          <Route exact path="/checkout">
+            <BookCheckout />
+          </Route>
+          <Route exact path="/return">
+            <BookReturn />
           </Route>
         </Switch>
       </div>

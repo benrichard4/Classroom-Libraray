@@ -6,17 +6,16 @@ import { useAuth0 } from "@auth0/auth0-react";
 import StudentLoginButton from "./StudentLoginButton";
 
 const Header = () => {
-  const { isAuthenticated, isLoading } = useAuth0();
-
-  if (isLoading) {
-    return <div>Loading ...</div>;
-  }
+  const { isAuthenticated, isLoading, user } = useAuth0();
 
   return (
     <HeaderStyle>
       <LoginContainer>
         {isAuthenticated ? (
-          <LogoutButton />
+          <>
+            <LogoutButton />
+            <div> Signed in as: {user.name ? user.name : user.email}</div>
+          </>
         ) : (
           <>
             <LoginButton />
