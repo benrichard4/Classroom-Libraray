@@ -11,7 +11,7 @@ import BookCheckout from "./component/BookCheckout";
 import BookReturn from "./component/BookReturn";
 import CreateClassroom from "./component/CreateClassroom";
 import CreateLibrary from "./CreateLibrary/CreateLibrary";
-import ModifyLibrary from "./CreateLibrary/ModifyLibrary";
+import LibraryAddBook from "./CreateLibrary/LibraryAddBook";
 
 const App = () => {
   return (
@@ -29,11 +29,11 @@ const App = () => {
           <Route exact path="/createclassroom">
             <CreateClassroom />
           </Route>
-          <Route exact path="/createlibrary">
+          <Route exact path="/library/create">
             <CreateLibrary />
           </Route>
-          <Route exact path="/modifylibrary/:_id">
-            <ModifyLibrary />
+          <Route exact path="/library/:_id/addbook">
+            <LibraryAddBook />
           </Route>
           <Route exact path="/classrooms">
             <Classrooms />

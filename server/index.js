@@ -15,6 +15,7 @@ express()
   .use(require("./routes/students"))
   .use(require("./routes/libraries"))
   .use(require("./routes/classrooms"))
+  .use(require("./routes/categories"))
 
   .get("*", (req, res) => {
     res.status(404).json({

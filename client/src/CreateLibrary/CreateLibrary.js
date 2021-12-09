@@ -62,7 +62,7 @@ const CreateLibrary = () => {
       .then((json) => {
         console.log("JSON", json);
         libraryNameSuccess();
-        history.push(`/modifylibrary/${json.data._id}`);
+        history.push(`/library/${json.data._id}/addbook`);
       })
       .catch((err) => {
         console.log("error:", err);

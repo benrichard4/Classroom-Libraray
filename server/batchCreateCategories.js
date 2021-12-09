@@ -2,7 +2,7 @@
 
 // Import requirements for the file-system and MongoDB
 const fs = require("file-system");
-const { v4: uuidv4 } = require("uuid");
+// const { v4: uuidv4 } = require("uuid");
 const { MongoClient } = require("mongodb");
 
 // Read the the file and JSON parse it
@@ -19,7 +19,7 @@ const options = {
 // Create the batchImport function
 
 const batchImportCategories = async () => {
-  const id = uuidv4();
+  const id = "Std_categories_booknook";
   const client = new MongoClient(MONGO_URI, options);
 
   await client.connect();

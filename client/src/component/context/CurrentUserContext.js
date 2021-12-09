@@ -44,16 +44,6 @@ const CurrentUserProvider = ({ children }) => {
   //check to see if user exists in teacher collection in db
   //if it does, get user
   //if it doesn't create user and set info
-  //   useEffect(() => {
-  //     console.log("in initial use effect", user);
-  //     if (user) {
-  //       setLoadingState();
-  //       getTeacherByEmail();
-  //     } else {
-  //       setLoggedOutState();
-  //     }
-  //   }, []);
-
   useEffect(() => {
     console.log("in other use effect", user);
     if (user) {

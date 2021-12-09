@@ -24,17 +24,18 @@ const TeacherMainPage = () => {
       )}
       {/* if user doesnt have a library prompt them to create one*/}
       {userState.currentUser.libraries.length < 1 && (
-        <NavLinkStyle to="/CreateLibrary">
+        <NavLinkStyle to="/library/create">
           <BigButton>New here? {"\n"}Click to add a Library</BigButton>
         </NavLinkStyle>
       )}
+      {/* if user does have a library, display it on dashboard */}
       {userState.currentUser.libraries.length >= 1 && (
         <BigDisplay>
           {userState.currentUser.libraries.map((library, index) => {
             return (
               <LibraryList key={index}>
                 <p>{library.name}</p>
-                <Link to={`/modifylibrary/${library._id}`}>Modify</Link>
+                <Link to={`/library/${library._id}/addbook`}>Modify</Link>
               </LibraryList>
             );
           })}
