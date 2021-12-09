@@ -10,7 +10,8 @@ import Libraries from "./component/Libraries";
 import BookCheckout from "./component/BookCheckout";
 import BookReturn from "./component/BookReturn";
 import CreateClassroom from "./component/CreateClassroom";
-import CreateLibrary from "./component/CreateLibrary";
+import CreateLibrary from "./CreateLibrary/CreateLibrary";
+import ModifyLibrary from "./CreateLibrary/ModifyLibrary";
 
 const App = () => {
   return (
@@ -30,6 +31,9 @@ const App = () => {
           </Route>
           <Route exact path="/createlibrary">
             <CreateLibrary />
+          </Route>
+          <Route exact path="/modifylibrary/:_id">
+            <ModifyLibrary />
           </Route>
           <Route exact path="/classrooms">
             <Classrooms />

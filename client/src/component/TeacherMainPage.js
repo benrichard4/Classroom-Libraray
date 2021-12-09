@@ -3,7 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { CurrentUserContext } from "./context/CurrentUserContext";
 import LoadingSpinner from "./LoadingSpinner";
 import styled from "styled-components";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const TeacherMainPage = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
@@ -13,7 +13,7 @@ const TeacherMainPage = () => {
   //   return <div>Loading ...</div>;
   // }
 
-  console.log(userState.currentUser);
+  console.log("CURRENT USER", userState.currentUser);
   return isAuthenticated && userState.currentUser ? (
     <Container>
       {/* if user doesnt have a classroom prompt them to create one*/}
@@ -27,6 +27,18 @@ const TeacherMainPage = () => {
         <NavLinkStyle to="/CreateLibrary">
           <BigButton>New here? {"\n"}Click to add a Library</BigButton>
         </NavLinkStyle>
+      )}
+      {userState.currentUser.libraries.length >= 1 && (
+        <BigDisplay>
+          {userState.currentUser.libraries.map((library, index) => {
+            return (
+              <LibraryList key={index}>
+                <p>{library.name}</p>
+                <Link to={`/modifylibrary/${library._id}`}>Modify</Link>
+              </LibraryList>
+            );
+          })}
+        </BigDisplay>
       )}
       <NavLinkStyle to="/checkout">
         <BigButton>Checkout book</BigButton>
@@ -63,4 +75,11 @@ const BigButton = styled.div`
   text-align: center;
   vertical-align: middle;
   line-height: 25vh;
+`;
+
+const BigDisplay = styled(BigButton)``;
+const LibraryList = styled.div`
+  display: flex;
+
+  margin-left: 10px;
 `;
