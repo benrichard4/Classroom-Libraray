@@ -189,7 +189,7 @@ const addBookToLibrary = async (req, res) => {
       //does book exist in library? If it doesn't add it, if it does, send error Message
       const foundBook = await db
         .collection("Librairies")
-        .find({ "library.volumeNum": { $exists: true } });
+        .findOne({ _id, "library.volumeNum": volumeNum });
       console.log(foundBook);
       console.log(volumeNum);
       if (foundBook) {

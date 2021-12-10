@@ -1,9 +1,10 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router";
-import { getPaginatedSearchResults } from "../services/GoogleBooks";
+import { getPaginatedSearchResults } from "../../services/GoogleBooks";
 import Step1Search from "./Step1Search";
+import { CurrentUserContext } from "../context/CurrentUserContext";
 
 const initialState = {
   status: "idle",
@@ -34,6 +35,7 @@ const CreateLibrary = () => {
   const [libName, setLibName] = useState("");
   const { user } = useAuth0();
   const history = useHistory();
+  const { getTeacherByEmail } = useContext(CurrentUserContext);
 
   const handleOnChange = (data) => {
     setLibName(data);
@@ -62,6 +64,7 @@ const CreateLibrary = () => {
       .then((json) => {
         console.log("JSON", json);
         libraryNameSuccess();
+        getTeacherByEmail();
         history.push(`/library/${json.data._id}/addbook`);
       })
       .catch((err) => {
@@ -105,8 +108,6 @@ const CreateLibrary = () => {
   );
 };
 
-export default CreateLibrary;
-
 const Container = styled.div`
   max-width: 80vw;
   /* min-height: 70vh; */
@@ -114,3 +115,5 @@ const Container = styled.div`
   flex: 3;
   margin: 20px auto;
 `;
+
+export default CreateLibrary;

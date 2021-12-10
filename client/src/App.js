@@ -10,8 +10,9 @@ import Libraries from "./component/Libraries";
 import BookCheckout from "./component/BookCheckout";
 import BookReturn from "./component/BookReturn";
 import CreateClassroom from "./component/CreateClassroom";
-import CreateLibrary from "./CreateLibrary/CreateLibrary";
-import LibraryAddBook from "./CreateLibrary/LibraryAddBook";
+import CreateLibrary from "./component/CreateLibrary/CreateLibrary";
+import LibraryAddBook from "./component/CreateLibrary/LibraryAddBook";
+import LibrariesBrowse from "./component/LibrariesBrowse";
 
 const App = () => {
   return (
@@ -26,7 +27,7 @@ const App = () => {
           <Route exact path="/teacher">
             <TeacherMainPage />
           </Route>
-          <Route exact path="/createclassroom">
+          <Route exact path="/classroom/create">
             <CreateClassroom />
           </Route>
           <Route exact path="/library/create">
@@ -40,6 +41,9 @@ const App = () => {
           </Route>
           <Route exact path="/libraries">
             <Libraries />
+          </Route>
+          <Route exact path="/libraries/:_id">
+            <LibrariesBrowse />
           </Route>
           <Route exact path="/checkout">
             <BookCheckout />

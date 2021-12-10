@@ -1,12 +1,13 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
 import styled from "styled-components";
-import LoadingSpinner from "../component/LoadingSpinner";
-import { getPaginatedSearchResults } from "../services/GoogleBooks";
+import LoadingSpinner from "../LoadingSpinner";
+import { getPaginatedSearchResults } from "../../services/GoogleBooks";
 import Step1Search from "./Step1Search";
 import Step2Categories from "./Step2Categories";
 import Step3Quantity from "./Step3Quantity";
 import Step4Finalize from "./Step4Finalize";
+import { CurrentUserContext } from "../context/CurrentUserContext";
 
 const initialState = {
   step: 1,
@@ -183,7 +184,7 @@ const LibraryAddBook = () => {
     <>
       {currentLibrary && (
         <>
-          <h1>{currentLibrary.name}: Add Books</h1>
+          <Title>{currentLibrary.name}: Add Books</Title>
           <Container>
             <FirstBox>
               {state.step === 1 && state.bookComplete === false && (
@@ -333,6 +334,11 @@ const LibraryAddBook = () => {
   );
 };
 
+const Title = styled.h1`
+  margin-left: 10vw;
+  margin-top: 10px;
+`;
+
 const Container = styled.div`
   max-width: 80vw;
   min-height: 70vh;
@@ -352,6 +358,7 @@ const Box = styled.div`
 `;
 const FirstBox = styled(Box)`
   flex: 3;
+  /* min-width: 350px; */
 `;
 
 const SecondBox = styled(Box)`

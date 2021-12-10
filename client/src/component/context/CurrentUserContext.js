@@ -136,6 +136,7 @@ const CurrentUserProvider = ({ children }) => {
     <CurrentUserContext.Provider
       value={{
         userState,
+        getTeacherByEmail,
         actions: {
           setLoggedOutState,
           setLoadingState,
