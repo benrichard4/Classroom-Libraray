@@ -63,7 +63,7 @@ const CompanyName = styled.h1`
 const QuickLinksDiv = styled.div`
   position: absolute;
   bottom: 0;
-  left: 100px;
+  left: 10vw;
   /* border: 1px solid red; */
   width: 65%;
   height: 25%;
@@ -76,6 +76,7 @@ const QuickLink = styled(NavLink)`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  margin-right: auto;
   /* border: 1px solid green; */
 `;
 

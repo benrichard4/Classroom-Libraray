@@ -110,7 +110,7 @@ const addNewClassroom = async (req, res) => {
     if (foundClassroomWithSameName) {
       return res.status(400).json({
         status: 400,
-        errorMsg: "Library name exists",
+        errorMsg: "Classname already exists. Pick a different name",
       });
     } else {
       uniqueName = true;

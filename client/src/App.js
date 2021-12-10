@@ -2,17 +2,18 @@ import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import styled from "styled-components";
 import GlobalStyles from "./component/GlobalStyles";
-import Header from "./component/Header";
+import Header from "./component/Header Components/Header";
 import HomePage from "./component/HomePage";
 import TeacherMainPage from "./component/TeacherMainPage";
-import Classrooms from "./component/Classrooms";
-import Libraries from "./component/Libraries";
+import Classrooms from "./component/Classroom components/Classrooms";
+import Libraries from "./component/Library Components/Libraries";
 import BookCheckout from "./component/BookCheckout";
 import BookReturn from "./component/BookReturn";
-import CreateClassroom from "./component/CreateClassroom";
-import CreateLibrary from "./component/CreateLibrary/CreateLibrary";
-import LibraryAddBook from "./component/CreateLibrary/LibraryAddBook";
-import LibrariesBrowse from "./component/LibrariesBrowse";
+import CreateClassroom from "./component/Classroom components/CreateClassroom";
+import CreateLibrary from "./component/Library Components/CreateLibrary/CreateLibrary";
+import LibraryAddBook from "./component/Library Components/CreateLibrary/LibraryAddBook";
+import LibrariesBrowse from "./component/Library Components/LibrariesBrowse";
+import ClassroomAddClassList from "./component/Classroom components/ClassroomAddClassList";
 
 const App = () => {
   return (
@@ -29,6 +30,9 @@ const App = () => {
           </Route>
           <Route exact path="/classroom/create">
             <CreateClassroom />
+          </Route>
+          <Route exact path="/classroom/:_id/addclasslist">
+            <ClassroomAddClassList />
           </Route>
           <Route exact path="/library/create">
             <CreateLibrary />

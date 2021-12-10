@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import LoadingSpinner from "../LoadingSpinner";
-import { getPaginatedSearchResults } from "../../services/GoogleBooks";
+import LoadingSpinner from "../../LoadingSpinner";
+import { getPaginatedSearchResults } from "../../../services/GoogleBooks";
 import Step1SearchResult from "./Step1SearchResult";
 
 const Step1Search = ({ setBookLinedUp }) => {

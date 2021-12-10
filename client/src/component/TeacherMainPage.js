@@ -50,6 +50,30 @@ const TeacherMainPage = () => {
           <BigButton>{"New here? \n 2. Click to add a Classroom"}</BigButton>
         </NavLinkStyle>
       )}
+      {/* if user does have a classroom, display it on dashboard */}
+      {userState.currentUser.classrooms.length >= 1 && (
+        <BigDisplay>
+          <LibraryTitleAndList>
+            <Title>Classrooms:</Title>
+            {userState.currentUser.classrooms.map((classroom, index) => {
+              return (
+                <LibraryList key={index}>
+                  <LibraryName>{classroom.name}: </LibraryName>
+                  <LinkStyle to={`/library/${classroom._id}`}>View</LinkStyle>
+                  <LinkStyle to={`/library/${classroom._id}/addbook`}>
+                    Modify
+                  </LinkStyle>
+                </LibraryList>
+              );
+            })}
+          </LibraryTitleAndList>
+          <NewLibDiv>
+            <NewLibLink to="/classroom/create">
+              Create a New Classroom
+            </NewLibLink>
+          </NewLibDiv>
+        </BigDisplay>
+      )}
       <NavLinkStyle to="/checkout">
         <BigButton>Checkout book</BigButton>
       </NavLinkStyle>

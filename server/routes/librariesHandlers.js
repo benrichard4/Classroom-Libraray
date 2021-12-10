@@ -186,12 +186,10 @@ const addBookToLibrary = async (req, res) => {
     if (foundLibrary === null) {
       res.status(404).json({ status: 404, errorMsg: "Library Not Found" });
     } else {
+      const foundBook = foundLibrary.library.find((book) => {
+        return book.volumeNum === volumeNum;
+      });
       //does book exist in library? If it doesn't add it, if it does, send error Message
-      const foundBook = await db
-        .collection("Librairies")
-        .findOne({ _id, "library.volumeNum": volumeNum });
-      console.log(foundBook);
-      console.log(volumeNum);
       if (foundBook) {
         return res.status(400).json({
           status: 400,

@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
 import styled from "styled-components";
-import LoadingSpinner from "../LoadingSpinner";
-import { getPaginatedSearchResults } from "../../services/GoogleBooks";
+import LoadingSpinner from "../../LoadingSpinner";
+import { getPaginatedSearchResults } from "../../../services/GoogleBooks";
 import Step1Search from "./Step1Search";
 import Step2Categories from "./Step2Categories";
 import Step3Quantity from "./Step3Quantity";
 import Step4Finalize from "./Step4Finalize";
-import { CurrentUserContext } from "../context/CurrentUserContext";
+import { CurrentUserContext } from "../../context/CurrentUserContext";
 
 const initialState = {
   step: 1,

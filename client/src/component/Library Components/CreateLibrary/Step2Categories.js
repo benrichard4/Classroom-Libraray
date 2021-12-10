@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { CurrentUserContext } from "../context/CurrentUserContext";
+import { CurrentUserContext } from "../../context/CurrentUserContext";
 
 const Step2Categories = ({
   setAddCategory,
