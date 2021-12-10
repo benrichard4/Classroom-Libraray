@@ -139,14 +139,23 @@ const addLibrary = async (req, res) => {
 
 //ADD book to library
 //BODY:{
-//bookIsbn,
+//   volumeNum: null,
+//   title: null,
+//   authors: null,
+//   description: null,
+//   thumbnail: null,
+//   language: null,
+//   publishedDate: null,
+//   publisher: null,
+//   isbn13: null,
+//   isbn10: null,
 //categories,
 //waitingList,
 //qtyAvailable
 //}
 const addBookToLibrary = async (req, res) => {
   const { _id } = req.params;
-  const { bookIsbn, qtyAvailable } = req.body;
+  const { volumeNum, qtyAvailable } = req.body;
   const client = new MongoClient(MONGO_URI, options);
   //create checked out arrays depending on how many qtyAvailable there are
   let isCheckedout = [];
@@ -180,11 +189,14 @@ const addBookToLibrary = async (req, res) => {
       //does book exist in library? If it doesn't add it, if it does, send error Message
       const foundBook = await db
         .collection("Librairies")
-        .findOne({ _id, "library.bookIsbn": bookIsbn }, { "bookIsbn.$": 1 });
+        .find({ "library.volumeNum": { $exists: true } });
+      console.log(foundBook);
+      console.log(volumeNum);
       if (foundBook) {
         return res.status(400).json({
           status: 400,
-          ErrorMsg: "Book already exists, try modifyinig it with patch",
+          errorMsg:
+            "Book already exists, try modifying it another way, or add another book",
         });
       } else {
         //add it to the library

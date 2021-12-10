@@ -60,7 +60,7 @@ const Step1Search = ({ setBookLinedUp }) => {
   return (
     <>
       <FirstContainer>
-        <h1>Step 1: Find and choose Book</h1>
+        <h2>Step 1: Find and choose Book</h2>
         <FormDiv>
           <SearchForm onSubmit={handleSubmit}>
             <InputStyled
@@ -115,7 +115,7 @@ export default Step1Search;
 const FirstContainer = styled.div`
   display: flex;
   max-width: 800px;
-  width: 85%;
+  width: 30vw;
   margin: 0 auto;
   flex-direction: column;
   justify-content: flex-start;

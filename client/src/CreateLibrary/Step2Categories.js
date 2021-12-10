@@ -3,8 +3,9 @@ import styled from "styled-components";
 import { CurrentUserContext } from "../component/context/CurrentUserContext";
 
 const Step2Categories = ({
+  setAddCategory,
+  setRemoveCategory,
   setCategoriesLinedUp,
-  removeCategoryLinedUp,
   state,
 }) => {
   const [allCategories, setAllCategories] = useState({});
@@ -41,10 +42,10 @@ const Step2Categories = ({
           return category === "Non-Fiction";
         })
       ) {
-        setCategoriesLinedUp(e.target.value);
-        removeCategoryLinedUp("Non-Fiction");
+        setAddCategory(e.target.value);
+        setRemoveCategory("Non-Fiction");
       } else {
-        setCategoriesLinedUp(e.target.value);
+        setAddCategory(e.target.value);
       }
     } else if (e.target.value === "Non-Fiction") {
       if (
@@ -52,31 +53,34 @@ const Step2Categories = ({
           return category === "Fiction";
         })
       ) {
-        setCategoriesLinedUp(e.target.value);
-        removeCategoryLinedUp("Fiction");
+        setAddCategory(e.target.value);
+        setRemoveCategory("Fiction");
       } else {
-        setCategoriesLinedUp(e.target.value);
+        setAddCategory(e.target.value);
       }
     } else {
       if (e.target.checked) {
-        setCategoriesLinedUp(e.target.value);
+        setAddCategory(e.target.value);
       } else {
-        removeCategoryLinedUp(e.target.value);
+        setRemoveCategory(e.target.value);
       }
     }
   };
 
-  console.log("stateinsidecategories", state.categories);
+  const handleCompleteOnClick = () => {
+    setCategoriesLinedUp();
+  };
+
   return (
     <Container>
-      <h1>Step 2: Choose Categories</h1>
+      <h2>Step 2: Choose Categories</h2>
       {loading ? (
         <div>Loading...</div>
       ) : (
         <>
           {Object.keys(allCategories).map((filters, index) => {
             return (
-              <form key={index}>
+              <FormStyle key={index}>
                 <FilterName>{filters.toUpperCase()}</FilterName>
                 <Divider />
                 <FilterOptionContainer>
@@ -88,9 +92,9 @@ const Step2Categories = ({
                           name={filters === "type" ? "type" : filters}
                           id={filter}
                           value={filter}
-                          //   checked={state.categories.some((category) => {
-                          //     return category === filter;
-                          //   })}
+                          checked={state.categories.find((category) => {
+                            return category === filter;
+                          })}
                           onChange={(e) => {
                             handleOnChange(e);
                           }}
@@ -100,9 +104,12 @@ const Step2Categories = ({
                     );
                   })}
                 </FilterOptionContainer>
-              </form>
+              </FormStyle>
             );
           })}
+          <CompleteCategoriesButton onClick={handleCompleteOnClick}>
+            Complete Categories
+          </CompleteCategoriesButton>
         </>
       )}
     </Container>
@@ -112,6 +119,10 @@ const Step2Categories = ({
 const Container = styled.div`
   /* border: 1px solid red; */
   width: 95%;
+`;
+
+const FormStyle = styled.form`
+  margin-top: 10px;
 `;
 
 const FilterName = styled.p`
@@ -139,6 +150,11 @@ const FilterOption = styled.div`
 
 const LabelStyle = styled.label`
   margin-left: 3px;
+`;
+
+const CompleteCategoriesButton = styled.button`
+  padding: 10px;
+  cursor: pointer;
 `;
 
 export default Step2Categories;
