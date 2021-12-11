@@ -77,6 +77,7 @@ const getStudentsByClassroom = async (req, res) => {
     const foundStudents = await db
       .collection("Students")
       .find({ classroomId: classroom_id })
+      .sort({ surname: 1 })
       .toArray();
     console.log(foundStudents);
     if (foundStudents) {
@@ -108,6 +109,7 @@ const addNewStudent = async (req, res) => {
   const { classroom_id } = req.params;
   //cycle through req.body to and complete the student object by adding a username, password, books checkedout list and waitinglist
   const id = uuidv4();
+  console.log(req.body);
   UpdatedStudentArray = req.body.map((studentObject) => {
     const id = uuidv4();
     const username = studentObject.givenName

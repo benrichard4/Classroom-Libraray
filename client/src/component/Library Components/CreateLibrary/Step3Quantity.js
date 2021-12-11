@@ -25,10 +25,7 @@ const Step3Quantity = ({ setQuantityLinedUp, stateQty }) => {
             >
               {values.map((value1) => {
                 return (
-                  <option
-                    value={value1}
-                    defaultValue={stateQty ? stateQty : false}
-                  >
+                  <option value={value1} defaultValue={stateQty ? stateQty : 1}>
                     {value1}
                   </option>
                 );

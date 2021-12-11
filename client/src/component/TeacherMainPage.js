@@ -59,8 +59,8 @@ const TeacherMainPage = () => {
               return (
                 <LibraryList key={index}>
                   <LibraryName>{classroom.name}: </LibraryName>
-                  <LinkStyle to={`/library/${classroom._id}`}>View</LinkStyle>
-                  <LinkStyle to={`/library/${classroom._id}/addbook`}>
+                  <LinkStyle to={`/classroom/${classroom._id}`}>View</LinkStyle>
+                  <LinkStyle to={`/classroom/${classroom._id}/addclasslist`}>
                     Modify
                   </LinkStyle>
                 </LibraryList>

@@ -46,7 +46,7 @@ const App = () => {
           <Route exact path="/libraries">
             <Libraries />
           </Route>
-          <Route exact path="/libraries/:_id">
+          <Route exact path="/library/:_id">
             <LibrariesBrowse />
           </Route>
           <Route exact path="/checkout">

@@ -94,7 +94,7 @@ const CreateLibrary = () => {
   const libraryNameFailure = (message) => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
-
+  console.log("IMPORTED ID CREATE", libId);
   return (
     <>
       <Title>Create-a-library</Title>
@@ -108,6 +108,7 @@ const CreateLibrary = () => {
               type="text"
               onChange={(e) => handleOnChange(e.target.value)}
               value={libName}
+              placeholder="Type Library Name..."
             ></input>
             {state.status === "loading" ? (
               <div>loading...</div>

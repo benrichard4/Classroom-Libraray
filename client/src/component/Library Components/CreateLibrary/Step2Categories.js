@@ -73,7 +73,12 @@ const Step2Categories = ({
 
   return (
     <Container>
-      <h2>Step 2: Choose Categories</h2>
+      <CatTitleDiv>
+        <h2>Step 2: Choose Categories </h2>
+        <CompleteCategoriesButton onClick={handleCompleteOnClick}>
+          Complete Categories
+        </CompleteCategoriesButton>
+      </CatTitleDiv>
       {loading ? (
         <div>Loading...</div>
       ) : (
@@ -83,7 +88,7 @@ const Step2Categories = ({
               <FormStyle key={index}>
                 <FilterName>{filters.toUpperCase()}</FilterName>
                 <Divider />
-                <FilterOptionContainer>
+                <FilterOptionContainer myindex={index === 0}>
                   {allCategories[filters].map((filter, index) => {
                     return (
                       <FilterOption key={index}>
@@ -107,9 +112,6 @@ const Step2Categories = ({
               </FormStyle>
             );
           })}
-          <CompleteCategoriesButton onClick={handleCompleteOnClick}>
-            Complete Categories
-          </CompleteCategoriesButton>
         </>
       )}
     </Container>
@@ -119,10 +121,28 @@ const Step2Categories = ({
 const Container = styled.div`
   /* border: 1px solid red; */
   width: 95%;
+  position: relative;
+  margin: 0 auto;
+`;
+
+const CatTitleDiv = styled.div`
+  position: sticky;
+  top: 0px;
+  background-color: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid silver;
+  width: 100%;
 `;
 
 const FormStyle = styled.form`
   margin-top: 10px;
+  box-shadow: 0 0 5px 1px silver inset;
+  border-radius: 2px;
+  padding: 10px;
 `;
 
 const FilterName = styled.p`
@@ -136,12 +156,16 @@ const Divider = styled.hr`
 const FilterOptionContainer = styled.div`
   margin: 5px 5px 10px 5px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
-  /* max-height: calc(500px - 0.75 * 30vw); */
-  /* max-width: 100%; */
+  align-content: flex-start;
+  gap: 2px 15px;
+  max-height: calc(500px - 0.75 * 30vw);
+  min-height: ${({ myindex }) => (myindex ? "50px" : "100px")};
+  max-width: 98%;
   height: 100%;
   width: 100%;
+  /* border: 1px solid pink; */
 `;
 
 const FilterOption = styled.div`
@@ -155,6 +179,8 @@ const LabelStyle = styled.label`
 const CompleteCategoriesButton = styled.button`
   padding: 10px;
   cursor: pointer;
+
+  top: 0;
 `;
 
 export default Step2Categories;

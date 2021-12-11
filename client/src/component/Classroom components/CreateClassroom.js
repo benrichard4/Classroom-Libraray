@@ -6,6 +6,7 @@ import { useHistory } from "react-router";
 import { CurrentUserContext } from "../context/CurrentUserContext";
 import { Link } from "react-router-dom";
 import SuccessModal from "../SuccessModal";
+import Title from "../Title";
 
 const initialState = {
   status: "idle",
@@ -161,11 +162,6 @@ const CreateClassroom = () => {
     </>
   );
 };
-
-const Title = styled.h1`
-  margin-left: 10vw;
-  margin-top: 10px;
-`;
 
 const Container = styled.div`
   max-width: 80vw;

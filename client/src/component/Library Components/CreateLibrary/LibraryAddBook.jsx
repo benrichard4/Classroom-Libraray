@@ -98,7 +98,6 @@ const reducer = (state, action) => {
       return {
         ...state,
         step: 1,
-        bookComplete: false,
       };
     case "RETURN-TO-STEP2":
       return {
@@ -179,7 +178,6 @@ const LibraryAddBook = () => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
 
-  console.log("STATE", state);
   return (
     <>
       {currentLibrary && (
@@ -187,7 +185,7 @@ const LibraryAddBook = () => {
           <Title>{currentLibrary.name}: Add Books</Title>
           <Container>
             <FirstBox>
-              {state.step === 1 && state.bookComplete === false && (
+              {state.step === 1 && (
                 <Step1Search setBookLinedUp={setBookLinedUp} />
               )}
               {state.step === 2 && state.categoriesComplete === false && (
@@ -352,13 +350,17 @@ const Box = styled.div`
   border: 1px solid grey;
   border-right: none;
   padding: 10px;
+  max-height: 70vh;
   &:last-child {
     border-right: 1px solid grey;
   }
 `;
 const FirstBox = styled(Box)`
   flex: 3;
-  /* min-width: 350px; */
+  overflow: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding-top: 0;
 `;
 
 const SecondBox = styled(Box)`
@@ -373,18 +375,25 @@ const ThirdBox = styled(Box)`
 `;
 
 const StepDiv = styled.button`
-  background-color: transparent;
+  background-color: ${({ complete }) =>
+    complete ? " rgb(84,192,84, 0.2) " : "rgb(255,215,215,0.2)"};
   text-align: left;
   min-height: 10vh;
   display: flex;
   flex-direction: column;
-  border: ${({ complete }) => (complete ? "1px solid green" : "1px solid red")};
-  padding: 5px;
+  box-shadow: ${({ complete }) =>
+    complete
+      ? "0 0 5px 1px rgb(84,192,84)"
+      : "0 0 5px 1px rgb(255,100,100,1) "};
+  padding: 10px;
+  border-radius: 3px;
   margin: 10px;
   cursor: pointer;
+  border: none;
   &:hover {
-    background-color: whitesmoke;
+    transform: scale(1.02);
   }
+  transition: 200ms ease;
 `;
 
 const ListStyle = styled.ul`
@@ -402,9 +411,12 @@ const BigButton = styled.button`
   height: 50px;
   margin: 10px auto;
   color: white;
+  text-shadow: 0 0 5px black;
   border: none;
-  background-color: ${({ buttonActive }) => (buttonActive ? "green" : "red")};
+  background-color: ${({ buttonActive }) =>
+    buttonActive ? "green" : "rgb(255,0,0,0.5)"};
   cursor: ${({ buttonActive }) => (buttonActive ? "pointer" : "default")};
+  border-radius: 3px;
 `;
 
 const BookListDiv = styled.div``;

@@ -17,4 +17,18 @@ export default createGlobalStyle`
         font-family: Arial, Helvetica, sans-serif, sans-serif;
         font-weight: 500;
     }
+
+    /* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 7px;
+}
+
+*::-webkit-scrollbar-track {
+  background: none ;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: grey;
+  border-radius: 55px;
+}
 `;

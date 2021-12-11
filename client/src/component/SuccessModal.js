@@ -5,7 +5,7 @@ import Modal from "./Modal";
 
 const SuccessModal = ({ type, importedState, importedId }) => {
   const [state, setState] = useState(null);
-
+  console.log("IMPORTED ID MODAL", importedId);
   useEffect(() => {
     if (type === "library") {
       const libState = {
@@ -28,12 +28,12 @@ const SuccessModal = ({ type, importedState, importedId }) => {
       };
       setState(classState);
     }
-  }, []);
+  }, [importedId]);
 
   const handleButtonClick = () => {
     setState(null);
   };
-  console.log("IN MODAL");
+  console.log("IN MODAL", state);
   return (
     state && (
       <Modal

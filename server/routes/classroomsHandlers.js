@@ -38,6 +38,7 @@ const getAllClassrooms = async (req, res) => {
   }
 };
 
+//GET CLASSROOMS BY ID
 const getClassroomsById = async (req, res) => {
   const { _id } = req.params;
 
