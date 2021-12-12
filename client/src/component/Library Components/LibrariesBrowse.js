@@ -1,28 +1,82 @@
 import React, { useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
 import styled from "styled-components";
+import CategoriesSideBar from "./CategoriesSideBar";
 
-let initialState = {
+const initialState = {
   status: "idle",
-  filters: [],
+  selectedFilters: [],
+  fullLibrary: null,
   filteredLibrary: null,
   error: null,
 };
 
 const reducer = (state, action) => {
+  const filterLibraryFunction = (filters, filteredLibrary) => {
+    if (filters.length === 0) {
+      return state.fullLibrary;
+    } else {
+      //filter through library to get book
+      console.log("INFILTEREDFUNCTION", filters, filteredLibrary);
+      let newFilteredLibrary = filteredLibrary.filter((book) => {
+        //filter through books' catergories
+        let arr = [];
+        book.categories.forEach((category) => {
+          //filter through filters array adn check to see if they match any of each book's categories. If it does, return it
+          filters.forEach((filter) => {
+            if (filter === category) {
+              arr.push(filter);
+            }
+          });
+        });
+        return arr.length === filters.length;
+      });
+      console.log("NEW FILTERED LIBRARY", newFilteredLibrary);
+      return newFilteredLibrary;
+    }
+  };
+
   switch (action.type) {
-    case "FILTER-REQUESTED":
+    case "PAGE-LOADED":
       return {
         ...state,
-        filters: filters.push(action.filter),
+        filteredLibrary: action.library,
+        fullLibrary: action.library,
+        status: "idle",
       };
-    case "FILTERED-LIBRARY-SUCCESS":
+    case "SET-LOADING":
       return {
         ...state,
+        status: "loading",
       };
-    case "FILTERED-LIBRARY-FAILURE":
+    case "ADD-FILTER":
+      let newFilterAdd = [...state.selectedFilters, action.filter];
       return {
         ...state,
+        status: "idle",
+        selectedFilters: newFilterAdd,
+        filteredLibrary: filterLibraryFunction(newFilterAdd, state.fullLibrary),
+      };
+    case "REMOVE-FILTER":
+      console.log(
+        "ACTION.FILTER",
+        action.filter,
+        "STATE.SELECTEDFILTERS",
+        state.selectedFilters
+      );
+      let newFiltersRemove = state.selectedFilters.filter((filterItem) => {
+        // console.log("filteritem", filterItem, "action.filter", action.filter);
+        return filterItem !== action.filter;
+      });
+      // console.log("NEWFILTERSREMOVE", newFiltersRemove);
+      return {
+        ...state,
+        status: "idle",
+        selectedFilters: newFiltersRemove,
+        filteredLibrary: filterLibraryFunction(
+          newFiltersRemove,
+          state.fullLibrary
+        ),
       };
     default:
       throw new Error(`${action.type} is not an action`);
@@ -31,7 +85,6 @@ const reducer = (state, action) => {
 
 const LibrariesBrowse = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [currentLibrary, setCurrentLibrary] = useState(null);
   const { _id } = useParams();
 
   //get the library in question. Then be able to filter it and display the results.
@@ -39,23 +92,55 @@ const LibrariesBrowse = () => {
     fetch(`/libraries/${_id}`)
       .then((res) => res.json())
       .then((LibraryData) => {
-        setCurrentLibrary(LibraryData.data);
+        console.log(LibraryData);
+        setPageLoaded(LibraryData.data.library);
       });
   }, []);
 
+  const setPageLoaded = (library) => {
+    dispatch({ type: "PAGE-LOADED", library: library });
+  };
+
+  const setAddFilter = (filter) => {
+    dispatch({ type: "ADD-FILTER", filter: filter });
+  };
+
+  const setRemoveFilter = (filter) => {
+    dispatch({ type: "REMOVE-FILTER", filter: filter });
+  };
+
+  console.log("FILTEREDSTATE", state);
   return (
-    <Container>
-      Container
-      <TopSectionDiv>
-        <TitleDiv>Title</TitleDiv>
-        <SearchDiv>SearchDiv</SearchDiv>
-        <DropDownDiv>DropDownDiv</DropDownDiv>
-      </TopSectionDiv>
-      <FilterAndDisplayDiv>
-        <SideCategoriesDiv>SideCategoriesDiv</SideCategoriesDiv>
-        <DisplayContainer>DisplayContainer</DisplayContainer>
-      </FilterAndDisplayDiv>
-    </Container>
+    state.filteredLibrary && (
+      <Container>
+        <TopSectionDiv>
+          <TitleDiv>
+            <h2>{state.filteredLibrary.name}</h2>
+          </TitleDiv>
+          <SearchDiv>SearchDiv</SearchDiv>
+          <DropDownDiv>DropDownDiv</DropDownDiv>
+        </TopSectionDiv>
+        <FilterAndDisplayDiv>
+          <SideCategoriesDiv>
+            <h3>Categories</h3>
+            <CategoriesSideBar
+              setAddFilter={setAddFilter}
+              setRemoveFilter={setRemoveFilter}
+              state={state}
+            />
+          </SideCategoriesDiv>
+          <DisplayContainer>
+            {state.filteredLibrary.map((book, index) => {
+              return (
+                <BookDiv key={index}>
+                  <img src={book.thumbnail} alt={`${book.title} pic`}></img>
+                </BookDiv>
+              );
+            })}
+          </DisplayContainer>
+        </FilterAndDisplayDiv>
+      </Container>
+    )
   );
 };
 
@@ -110,5 +195,9 @@ const DisplayContainer = styled.div`
   border: 1px solid black;
   margin: 5px 0;
   flex: 3;
+  display: flex;
+  flex-wrap: wrap;
 `;
+
+const BookDiv = styled.div``;
 export default LibrariesBrowse;
