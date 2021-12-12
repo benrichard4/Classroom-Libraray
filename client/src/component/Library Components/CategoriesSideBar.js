@@ -31,35 +31,35 @@ const CategoriesSideBar = ({ setAddFilter, setRemoveFilter, state }) => {
   }, [counter]);
 
   const handleOnChange = (e) => {
-    if (e.target.value === "Fiction") {
-      if (
-        state.selectedFilters.find((category) => {
-          return category === "Non-Fiction";
-        })
-      ) {
-        setAddFilter(e.target.value);
-        setRemoveFilter("Non-Fiction");
-      } else {
-        setRemoveFilter(e.target.value);
-      }
-    } else if (e.target.value === "Non-Fiction") {
-      if (
-        state.selectedFilters.find((category) => {
-          return category === "Fiction";
-        })
-      ) {
-        setAddFilter(e.target.value);
-        setRemoveFilter("Fiction");
-      } else {
-        setRemoveFilter(e.target.value);
-      }
+    // if (e.target.value === "Fiction") {
+    //   if (
+    //     state.selectedFilters.find((category) => {
+    //       return category === "Non-Fiction";
+    //     })
+    //   ) {
+    //     setAddFilter(e.target.value);
+    //     setRemoveFilter("Non-Fiction");
+    //   } else {
+    //     setAddFilter(e.target.value);
+    //   }
+    // } else if (e.target.value === "Non-Fiction") {
+    //   if (
+    //     state.selectedFilters.find((category) => {
+    //       return category === "Fiction";
+    //     })
+    //   ) {
+    //     setAddFilter(e.target.value);
+    //     setRemoveFilter("Fiction");
+    //   } else {
+    //     setAddFilter(e.target.value);
+    //   }
+    // } else {
+    if (e.target.checked) {
+      setAddFilter(e.target.value);
     } else {
-      if (e.target.checked) {
-        setAddFilter(e.target.value);
-      } else {
-        setRemoveFilter(e.target.value);
-      }
+      setRemoveFilter(e.target.value);
     }
+    // }
   };
 
   return (
@@ -81,9 +81,13 @@ const CategoriesSideBar = ({ setAddFilter, setRemoveFilter, state }) => {
                         name={filters === "type" ? "type" : filters}
                         id={filter}
                         value={filter}
-                        checked={state.selectedFilters.find((category) => {
-                          return category === filter;
-                        })}
+                        checked={
+                          state.selectedFilters.length === 0
+                            ? false
+                            : state.selectedFilters.find((category) => {
+                                return category === filter;
+                              })
+                        }
                         onChange={(e) => {
                           handleOnChange(e);
                         }}

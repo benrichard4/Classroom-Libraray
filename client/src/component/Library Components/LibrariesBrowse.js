@@ -14,7 +14,7 @@ const initialState = {
 const reducer = (state, action) => {
   const filterLibraryFunction = (filters, filteredLibrary) => {
     if (filters.length === 0) {
-      return state.fullLibrary;
+      return state.fullLibrary.library;
     } else {
       //filter through library to get book
       console.log("INFILTEREDFUNCTION", filters, filteredLibrary);
@@ -40,7 +40,7 @@ const reducer = (state, action) => {
     case "PAGE-LOADED":
       return {
         ...state,
-        filteredLibrary: action.library,
+        filteredLibrary: action.library.library,
         fullLibrary: action.library,
         status: "idle",
       };
@@ -55,7 +55,10 @@ const reducer = (state, action) => {
         ...state,
         status: "idle",
         selectedFilters: newFilterAdd,
-        filteredLibrary: filterLibraryFunction(newFilterAdd, state.fullLibrary),
+        filteredLibrary: filterLibraryFunction(
+          newFilterAdd,
+          state.fullLibrary.library
+        ),
       };
     case "REMOVE-FILTER":
       console.log(
@@ -75,7 +78,7 @@ const reducer = (state, action) => {
         selectedFilters: newFiltersRemove,
         filteredLibrary: filterLibraryFunction(
           newFiltersRemove,
-          state.fullLibrary
+          state.fullLibrary.library
         ),
       };
     default:
@@ -93,7 +96,7 @@ const LibrariesBrowse = () => {
       .then((res) => res.json())
       .then((LibraryData) => {
         console.log(LibraryData);
-        setPageLoaded(LibraryData.data.library);
+        setPageLoaded(LibraryData.data);
       });
   }, []);
 
@@ -115,7 +118,7 @@ const LibrariesBrowse = () => {
       <Container>
         <TopSectionDiv>
           <TitleDiv>
-            <h2>{state.filteredLibrary.name}</h2>
+            <h2>{state.fullLibrary.name}</h2>
           </TitleDiv>
           <SearchDiv>SearchDiv</SearchDiv>
           <DropDownDiv>DropDownDiv</DropDownDiv>
@@ -130,13 +133,25 @@ const LibrariesBrowse = () => {
             />
           </SideCategoriesDiv>
           <DisplayContainer>
-            {state.filteredLibrary.map((book, index) => {
-              return (
-                <BookDiv key={index}>
-                  <img src={book.thumbnail} alt={`${book.title} pic`}></img>
-                </BookDiv>
-              );
-            })}
+            <BookBox>
+              {state.filteredLibrary.length === 0 ? (
+                <h3> No results found</h3>
+              ) : (
+                state.filteredLibrary.map((book, index) => {
+                  return (
+                    <BookDiv key={index}>
+                      <ImgDiv>
+                        <BookImg
+                          src={book.thumbnail}
+                          alt={`${book.title} pic`}
+                        ></BookImg>
+                      </ImgDiv>
+                      <BookInfo>Title: {book.title}</BookInfo>
+                    </BookDiv>
+                  );
+                })
+              )}
+            </BookBox>
           </DisplayContainer>
         </FilterAndDisplayDiv>
       </Container>
@@ -194,10 +209,43 @@ const SideCategoriesDiv = styled.div`
 const DisplayContainer = styled.div`
   border: 1px solid black;
   margin: 5px 0;
-  flex: 3;
-  display: flex;
-  flex-wrap: wrap;
+  flex: 4;
 `;
 
-const BookDiv = styled.div``;
+const BookBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  /* justify-content: center; */
+  align-content: flex-start;
+  border: 2px solid red;
+  margin: 5px 3%;
+`;
+
+const BookDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  height: 200px;
+  width: 30%; //275px;;
+  min-width: 200px;
+  margin: 5px;
+`;
+
+const ImgDiv = styled.div`
+  border: 1px solid green;
+  width: 100%;
+  height: 50%;
+  display: flex;
+  /* justify-content: left; */
+`;
+
+const BookImg = styled.img`
+  margin: 0 5px;
+  height: 100%;
+`;
+
+const BookInfo = styled.p`
+  font-size: 1.1vw;
+`;
 export default LibrariesBrowse;
