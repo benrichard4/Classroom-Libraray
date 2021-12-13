@@ -219,6 +219,9 @@ const AddNameContainer = styled.div`
   border-bottom: 1px solid silver;
   border-right: 1px solid silver;
   flex: 8;
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 const StudentNum = styled.p`
