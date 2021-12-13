@@ -1,8 +1,13 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const StudentLoginButton = () => {
-  return <LoginButtonStyle>Student Log In</LoginButtonStyle>;
+  return (
+    <Link to="/student/login">
+      <LoginButtonStyle>Student Log In</LoginButtonStyle>
+    </Link>
+  );
 };
 
 export default StudentLoginButton;

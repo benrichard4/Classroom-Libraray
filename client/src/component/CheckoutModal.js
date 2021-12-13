@@ -68,7 +68,7 @@ const CheckoutModal = ({
       .then((json) => {
         if (json.status === 200) {
           checkoutSuccessful();
-          window.location.reload();
+          //   window.location.reload();
           return;
         } else {
           checkoutFailed(json.errorMsg);

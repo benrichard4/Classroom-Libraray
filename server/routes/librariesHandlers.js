@@ -395,9 +395,11 @@ const checkinBook = async (req, res) => {
       });
       const foundBookObject = foundBookArray[0];
       //find index of student id in checkedOutBy field
-      const indexOfStudentId = foundBookObject.checkedOutBy.findIndex(
-        (x) => x._id === student_id
-      );
+      const indexOfStudentId = foundBookObject.checkedOutBy.findIndex((x) => {
+        if (x) {
+          return x._id === student_id;
+        }
+      });
       //update the key value pairs for new book object
       let newQtyAvailable = foundBookObject.qtyAvailable + 1;
       let newIsCheckedoutArray = foundBookObject.isCheckedout;

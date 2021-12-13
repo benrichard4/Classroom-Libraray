@@ -37,7 +37,7 @@ const BookDetail = () => {
   useEffect(() => {
     getLibraryFunction();
     getClassRoomsByLibId();
-  }, [returnStatus]);
+  }, [returnStatus, checkoutStatus]);
 
   //function that fetches library with id from params
   const getLibraryFunction = () => {

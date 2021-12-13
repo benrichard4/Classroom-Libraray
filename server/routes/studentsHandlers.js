@@ -29,7 +29,7 @@ const getAllStudents = async (req, res) => {
     } else {
       res
         .status(400)
-        .json({ status: 400, ErrorMsg: "no Students found in db" });
+        .json({ status: 400, errorMsg: "no Students found in db" });
     }
     client.close();
   } catch (e) {
@@ -56,7 +56,37 @@ const getStudentById = async (req, res) => {
     } else {
       res.status(400).json({
         status: 400,
-        ErrorMsg: "no Student found in db with given id",
+        errorMsg: "no Student found in db with given id",
+      });
+    }
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//STUDENTS BY LOGIN
+const studentLogin = async (req, res) => {
+  const { username, password } = req.body;
+
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    const foundStudent = await db
+      .collection("Students")
+      .findOne({ username, password });
+    if (foundStudent) {
+      res.status(200).json({
+        status: 200,
+        data: foundStudent,
+        message: "Student found",
+      });
+    } else {
+      res.status(400).json({
+        status: 400,
+        errorMsg: "Incorrect username or password. Please try again.",
       });
     }
     client.close();
@@ -220,6 +250,7 @@ module.exports = {
   getAllStudents,
   getStudentById,
   getStudentsByClassroom,
+  studentLogin,
   addNewStudent,
   deleteStudentById,
 };

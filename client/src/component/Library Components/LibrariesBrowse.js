@@ -132,7 +132,11 @@ const LibrariesBrowse = () => {
             setAddFilter={setAddFilter}
             setRemoveFilter={setRemoveFilter}
             state={state}
-            currentTeacher={userState.currentUser}
+            currentTeacher={
+              userState.userType === "teacher"
+                ? userState.currentUser
+                : userState.studentTeacher
+            }
           />
         </SideCategoriesDiv>
         <DisplayContainer>

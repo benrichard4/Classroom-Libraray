@@ -13,6 +13,8 @@ import LibraryAddBook from "./component/Library Components/CreateLibrary/Library
 import LibrariesBrowse from "./component/Library Components/LibrariesBrowse";
 import ClassroomAddClassList from "./component/Classroom components/ClassroomAddClassList";
 import BookDetail from "./component/Library Components/BookDetail";
+import StudentLoginPage from "./component/Students/StudentLoginPage";
+import StudentMainPage from "./component/Students/StudentMainPage";
 
 const App = () => {
   return (
@@ -23,6 +25,12 @@ const App = () => {
         <Switch>
           <Route exact path="/">
             <HomePage />
+          </Route>
+          <Route exact path="/student/login">
+            <StudentLoginPage />
+          </Route>
+          <Route exact path="/student/:_id">
+            <StudentMainPage />
           </Route>
           <Route exact path="/teacher">
             <TeacherMainPage />

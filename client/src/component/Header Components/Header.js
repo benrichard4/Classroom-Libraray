@@ -1,33 +1,67 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useHistory } from "react-router";
+import { NavLink } from "react-router-dom";
+
+import { CgProfile, CgWindows } from "react-icons/cg";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
-import { useAuth0 } from "@auth0/auth0-react";
 import StudentLoginButton from "./StudentLoginButton";
-import { NavLink } from "react-router-dom";
-import { CgProfile } from "react-icons/cg";
+import { CurrentUserContext } from "../context/CurrentUserContext";
+
 const Header = () => {
   const { isAuthenticated, isLoading, user } = useAuth0();
+  const history = useHistory();
+  const {
+    userState,
+    setCurrentStudent,
+    currentStudent,
+    actions: { setLoggedOutState },
+  } = useContext(CurrentUserContext);
 
+  console.log(
+    "userState.userType",
+    userState.userType,
+    "currentSudent",
+    currentStudent
+  );
   return (
     <HeaderStyle>
       <CompanyName>BookNook</CompanyName>
       <QuickLinksDiv>
-        <QuickLink to="/teacher">
-          <LinkTitle>Dashboard</LinkTitle>
-        </QuickLink>
-        <QuickLink to="/libraries">
-          <LinkTitle>Libraries</LinkTitle>
-        </QuickLink>
-        <QuickLink to="/classrooms">
-          <LinkTitle>Classrooms</LinkTitle>
-        </QuickLink>
-        <QuickLink to="/checkout">
-          <LinkTitle>Check Out Book</LinkTitle>
-        </QuickLink>
-        <QuickLink to="/return">
-          <LinkTitle>Return</LinkTitle>
-        </QuickLink>
+        {userState.userType && (
+          <>
+            {userState.userType === "teacher" ? (
+              <>
+                <QuickLink to="/teacher">
+                  <LinkTitle>Dashboard</LinkTitle>
+                </QuickLink>
+                <QuickLink to="/libraries">
+                  <LinkTitle>Libraries</LinkTitle>
+                </QuickLink>
+                <QuickLink to="/classrooms">
+                  <LinkTitle>Classrooms</LinkTitle>
+                </QuickLink>
+                <QuickLink to="/checkout">
+                  <LinkTitle>Check Out Book</LinkTitle>
+                </QuickLink>
+                <QuickLink to="/return">
+                  <LinkTitle>Return</LinkTitle>
+                </QuickLink>
+              </>
+            ) : (
+              <>
+                <QuickLink to={`/student/${userState.currentUser._id}`}>
+                  <LinkTitle>Dashboard</LinkTitle>
+                </QuickLink>
+                <QuickLink to={`/library/${userState.studentLibrary}`}>
+                  <LinkTitle>Library</LinkTitle>
+                </QuickLink>
+              </>
+            )}
+          </>
+        )}
       </QuickLinksDiv>
       <LoginContainer>
         {isAuthenticated ? (
@@ -36,12 +70,28 @@ const Header = () => {
             <LogoutButton />
             <div> Signed in as: {user.name ? user.name : user.email}</div>
           </>
-        ) : (
+        ) : (userState.userType === null) & !currentStudent ? (
           <>
             <LoginButton />
 
             <StudentLoginButton />
           </>
+        ) : (
+          userState.userType !== null && (
+            <>
+              <StudentLogoutButton
+                onClick={() => {
+                  window.sessionStorage.removeItem("Student");
+                  setCurrentStudent(null);
+                  setLoggedOutState();
+                  history.push(`/`);
+                }}
+              >
+                LOGOUT
+              </StudentLogoutButton>
+              <div> Hi, {userState.currentUser.givenName}!</div>
+            </>
+          )
         )}
       </LoginContainer>
     </HeaderStyle>
@@ -98,4 +148,8 @@ const LoginContainer = styled.div`
 
 const CgProfileStyle = styled(CgProfile)`
   font-size: 30px;
+`;
+
+const StudentLogoutButton = styled.button`
+  font-size: 20px;
 `;
