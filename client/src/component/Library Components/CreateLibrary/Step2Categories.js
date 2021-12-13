@@ -35,7 +35,6 @@ const Step2Categories = ({
   }, [counter]);
 
   const handleOnChange = (e) => {
-    console.log("in on change", e.target.checked, e.target.value);
     if (e.target.value === "Fiction") {
       if (
         state.categories.find((category) => {

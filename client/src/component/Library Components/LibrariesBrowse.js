@@ -1,6 +1,11 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
+
+import { CurrentUserContext } from "../context/CurrentUserContext";
+import LoadingSpinner from "../LoadingSpinner";
+import SearchBar from "../SearchBar";
 import CategoriesSideBar from "./CategoriesSideBar";
 
 const initialState = {
@@ -17,7 +22,6 @@ const reducer = (state, action) => {
       return state.fullLibrary.library;
     } else {
       //filter through library to get book
-      console.log("INFILTEREDFUNCTION", filters, filteredLibrary);
       let newFilteredLibrary = filteredLibrary.filter((book) => {
         //filter through books' catergories
         let arr = [];
@@ -31,7 +35,6 @@ const reducer = (state, action) => {
         });
         return arr.length === filters.length;
       });
-      console.log("NEW FILTERED LIBRARY", newFilteredLibrary);
       return newFilteredLibrary;
     }
   };
@@ -61,17 +64,9 @@ const reducer = (state, action) => {
         ),
       };
     case "REMOVE-FILTER":
-      console.log(
-        "ACTION.FILTER",
-        action.filter,
-        "STATE.SELECTEDFILTERS",
-        state.selectedFilters
-      );
       let newFiltersRemove = state.selectedFilters.filter((filterItem) => {
-        // console.log("filteritem", filterItem, "action.filter", action.filter);
         return filterItem !== action.filter;
       });
-      // console.log("NEWFILTERSREMOVE", newFiltersRemove);
       return {
         ...state,
         status: "idle",
@@ -88,6 +83,7 @@ const reducer = (state, action) => {
 
 const LibrariesBrowse = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { userState } = useContext(CurrentUserContext);
   const { _id } = useParams();
 
   //get the library in question. Then be able to filter it and display the results.
@@ -95,7 +91,6 @@ const LibrariesBrowse = () => {
     fetch(`/libraries/${_id}`)
       .then((res) => res.json())
       .then((LibraryData) => {
-        console.log(LibraryData);
         setPageLoaded(LibraryData.data);
       });
   }, []);
@@ -112,55 +107,76 @@ const LibrariesBrowse = () => {
     dispatch({ type: "REMOVE-FILTER", filter: filter });
   };
 
-  console.log("FILTEREDSTATE", state);
-  return (
-    state.filteredLibrary && (
-      <Container>
-        <TopSectionDiv>
-          <TitleDiv>
-            <h2>{state.fullLibrary.name}</h2>
-          </TitleDiv>
-          <SearchDiv>SearchDiv</SearchDiv>
-          <DropDownDiv>DropDownDiv</DropDownDiv>
-        </TopSectionDiv>
-        <FilterAndDisplayDiv>
-          <SideCategoriesDiv>
-            <h3>Categories</h3>
-            <CategoriesSideBar
-              setAddFilter={setAddFilter}
-              setRemoveFilter={setRemoveFilter}
-              state={state}
-            />
-          </SideCategoriesDiv>
-          <DisplayContainer>
-            <BookBox>
-              {state.filteredLibrary.length === 0 ? (
-                <h3> No results found</h3>
-              ) : (
-                state.filteredLibrary.map((book, index) => {
-                  return (
-                    <BookDiv key={index}>
-                      <ImgDiv>
-                        <BookImg
-                          src={book.thumbnail}
-                          alt={`${book.title} pic`}
-                        ></BookImg>
-                      </ImgDiv>
-                      <BookInfo>Title: {book.title}</BookInfo>
-                    </BookDiv>
-                  );
-                })
-              )}
-            </BookBox>
-          </DisplayContainer>
-        </FilterAndDisplayDiv>
-      </Container>
-    )
+  return state.fullLibrary === null || userState.currentUser === null ? (
+    <LoadingSpinner style={{ marginTop: "50px" }} />
+  ) : (
+    <Container>
+      <TopSectionDiv>
+        <TitleDiv>
+          <h2>{state.fullLibrary.name}</h2>
+        </TitleDiv>
+        <SearchDiv>
+          <SearchBar
+            suggestions={state.fullLibrary.library}
+            handleSelect={(suggestion) => {
+              window.alert(suggestion);
+            }}
+          />
+        </SearchDiv>
+        <DropDownDiv>DropDownDiv</DropDownDiv>
+      </TopSectionDiv>
+      <FilterAndDisplayDiv>
+        <SideCategoriesDiv>
+          <h3>Categories</h3>
+          <CategoriesSideBar
+            setAddFilter={setAddFilter}
+            setRemoveFilter={setRemoveFilter}
+            state={state}
+            currentTeacher={userState.currentUser}
+          />
+        </SideCategoriesDiv>
+        <DisplayContainer>
+          <BookBox>
+            {state.filteredLibrary.length === 0 ? (
+              <h3> No results found</h3>
+            ) : (
+              state.filteredLibrary.map((book, index) => {
+                return (
+                  <BookLink
+                    to={`/library/${_id}/book/${book.volumeNum}`}
+                    key={index}
+                  >
+                    <ImgDiv>
+                      <BookImg
+                        src={book.thumbnail}
+                        alt={`${book.title} pic`}
+                      ></BookImg>
+                      <BookInfo>
+                        Available: {book.qtyAvailable}/
+                        {book.isCheckedout.length}
+                      </BookInfo>
+                    </ImgDiv>
+                    <BookInfo>Title: {book.title}</BookInfo>
+                    <BookInfo>
+                      Author:{" "}
+                      {book.authors
+                        ? book.authors.map((author) => author)
+                        : "N/A"}
+                    </BookInfo>
+                  </BookLink>
+                );
+              })
+            )}
+          </BookBox>
+        </DisplayContainer>
+      </FilterAndDisplayDiv>
+    </Container>
   );
 };
 
 const Container = styled.div`
   margin: 0 auto;
+  margin-top: 10px;
   width: 80vw;
   max-width: 1200px;
   border: 1px solid black;
@@ -176,25 +192,25 @@ const TopSectionDiv = styled.div`
 `;
 
 const TitleDiv = styled.div`
-  flex: 2;
-  border: 1px solid black;
+  flex: 3;
+  /* border: 1px solid black; */
   margin: 5px 10px;
 `;
 
 const SearchDiv = styled.div`
-  flex: 3;
-  border: 1px solid black;
+  flex: 6;
+  /* border: 1px solid black; */
   margin: 5px 0;
 `;
 
 const DropDownDiv = styled.div`
-  flex: 1;
+  flex: 2;
   border: 1px solid black;
   margin: 5px 0;
 `;
 
 const FilterAndDisplayDiv = styled.div`
-  border: 1px solid black;
+  /* border: 1px solid black; */
   margin: 5px 0;
   display: flex;
   padding: 10px;
@@ -202,12 +218,12 @@ const FilterAndDisplayDiv = styled.div`
 
 const SideCategoriesDiv = styled.div`
   flex: 1;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   margin: 5px 0;
 `;
 
 const DisplayContainer = styled.div`
-  border: 1px solid black;
+  /* border: 1px solid black; */
   margin: 5px 0;
   flex: 4;
 `;
@@ -218,34 +234,44 @@ const BookBox = styled.div`
   flex-wrap: wrap;
   /* justify-content: center; */
   align-content: flex-start;
-  border: 2px solid red;
+  /* border: 2px solid red; */
   margin: 5px 3%;
 `;
 
-const BookDiv = styled.div`
+const BookLink = styled(Link)`
+  text-decoration: none;
+  color: black;
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  border: 1px solid lightblue;
   height: 200px;
   width: 30%; //275px;;
   min-width: 200px;
   margin: 5px;
+  padding: 10px;
+  &:hover {
+    box-shadow: 0 0 5px 1px lightblue;
+  }
 `;
 
 const ImgDiv = styled.div`
-  border: 1px solid green;
+  /* border: 1px solid green; */
   width: 100%;
   height: 50%;
   display: flex;
-  /* justify-content: left; */
+  margin-bottom: 10px;
+  justify-content: space-between;
 `;
 
 const BookImg = styled.img`
   margin: 0 5px;
   height: 100%;
+  margin-left: 10px;
+  max-width: 90px;
 `;
 
-const BookInfo = styled.p`
-  font-size: 1.1vw;
+const BookInfo = styled.div`
+  font-size: calc(12px + 0.3vw);
+  margin: 3px 0;
 `;
 export default LibrariesBrowse;

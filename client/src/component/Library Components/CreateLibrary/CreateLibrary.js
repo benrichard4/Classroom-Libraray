@@ -94,7 +94,7 @@ const CreateLibrary = () => {
   const libraryNameFailure = (message) => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
-  console.log("IMPORTED ID CREATE", libId);
+
   return (
     <>
       <Title>Create-a-library</Title>

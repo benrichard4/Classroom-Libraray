@@ -1,13 +1,11 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
 import styled from "styled-components";
 import LoadingSpinner from "../../LoadingSpinner";
-import { getPaginatedSearchResults } from "../../../services/GoogleBooks";
 import Step1Search from "./Step1Search";
 import Step2Categories from "./Step2Categories";
 import Step3Quantity from "./Step3Quantity";
 import Step4Finalize from "./Step4Finalize";
-import { CurrentUserContext } from "../../context/CurrentUserContext";
 
 const initialState = {
   step: 1,
@@ -178,11 +176,37 @@ const LibraryAddBook = () => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
 
+  const handleRemoveBook = (volumeNum) => {
+    setAddBookRequest();
+    fetch(`/libraries/${currentLibrary._id}/removeBook`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        volumeNum,
+      }),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.status === 200) {
+          setBookReqestSuccessful();
+          updateLibrary();
+        } else {
+          setRequestFailure(json.errorMsg);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setRequestFailure("An unknown error has occurred");
+      });
+  };
+
   return (
     <>
       {currentLibrary && (
         <>
-          <Title>{currentLibrary.name}: Add Books</Title>
+          <Title>{currentLibrary.name}: Add/Remove Books</Title>
           <Container>
             <FirstBox>
               {state.step === 1 && (
@@ -228,7 +252,7 @@ const LibraryAddBook = () => {
                 {state.categories.length > 0 && (
                   <ListStyle>
                     {state.categories.map((category) => {
-                      return <li>{category}</li>;
+                      return <ListItem>{category}</ListItem>;
                     })}
                   </ListStyle>
                 )}
@@ -278,7 +302,6 @@ const LibraryAddBook = () => {
                   })
                     .then((res) => res.json())
                     .then((json) => {
-                      console.log("json", json);
                       if (json.status === 201) {
                         setBookReqestSuccessful();
                         updateLibrary();
@@ -310,15 +333,24 @@ const LibraryAddBook = () => {
                           src={book.thumbnail}
                           alt={book.title}
                         ></ImageResult>
-                        <div>
+                        <BookInfo>
                           <p>
                             {book.title}, By:{" "}
-                            {book.authors.map((author) => author)}
+                            {book.authors
+                              ? book.authors.map((author) => author)
+                              : "N/A"}
                           </p>
                           <p style={{ fontSize: "13px", marginTop: "5px" }}>
                             Qty:{book.qtyAvailable}
                           </p>
-                        </div>
+                        </BookInfo>
+                        <DeleteButton
+                          onClick={() => {
+                            handleRemoveBook(book.volumeNum);
+                          }}
+                        >
+                          X
+                        </DeleteButton>
                       </BookItemDiv>
                     );
                   })}
@@ -366,8 +398,6 @@ const FirstBox = styled(Box)`
 const SecondBox = styled(Box)`
   display: flex;
   flex-direction: column;
-
-  /* justify-content: space-between; */
 `;
 
 const ThirdBox = styled(Box)`
@@ -379,6 +409,7 @@ const StepDiv = styled.button`
     complete ? " rgb(84,192,84, 0.2) " : "rgb(255,215,215,0.2)"};
   text-align: left;
   min-height: 10vh;
+  max-height: 30%;
   display: flex;
   flex-direction: column;
   box-shadow: ${({ complete }) =>
@@ -399,10 +430,20 @@ const StepDiv = styled.button`
 const ListStyle = styled.ul`
   margin-left: 20px;
   margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: 90%;
+  gap: 0 50px;
+`;
+
+const ListItem = styled.li`
+  max-width: 100px;
 `;
 
 const ChosenBookImg = styled.img`
-  width: 40%;
+  /* width: 40%; */
+  height: 80%;
   margin: 10px auto;
 `;
 
@@ -425,10 +466,29 @@ const BookItemDiv = styled.div`
   border: 1px solid silver;
   display: flex;
   align-items: center;
+  position: relative;
 `;
 
 const ImageResult = styled.img`
   width: 10%;
   margin: 5px;
+`;
+
+const BookInfo = styled.div`
+  /* border: 1px solid red; */
+  margin-right: 20px;
+`;
+
+const DeleteButton = styled.button`
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  color: #a01515;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 export default LibraryAddBook;

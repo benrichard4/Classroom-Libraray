@@ -2,68 +2,55 @@ import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { CurrentUserContext } from ".././context/CurrentUserContext";
 
-const CategoriesSideBar = ({ setAddFilter, setRemoveFilter, state }) => {
+//component for displaying the categories side bar in the library browser
+const CategoriesSideBar = ({
+  setAddFilter,
+  setRemoveFilter,
+  state,
+  currentTeacher,
+}) => {
   const [allCategories, setAllCategories] = useState({});
   const [counter, setCounter] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { userState } = useContext(CurrentUserContext);
 
   useEffect(() => {
     //for each category, fetch the information and save it to state
-    console.log("USERSTATE", userState);
-    userState.currentUser.categories.map((category) => {
-      fetch(`/categories/${category}`)
-        .then((res) => res.json())
-        .then((receivedCategories) => {
-          if (receivedCategories.status === 200) {
-            setCounter(counter + 1);
-            let addedCategories = receivedCategories.data.filters;
-            setAllCategories({ ...allCategories, ...addedCategories });
-          }
-        });
-    });
+    if (currentTeacher) {
+      currentTeacher.categories.map((category) => {
+        fetch(`/categories/${category}`)
+          .then((res) => res.json())
+          .then((receivedCategories) => {
+            if (receivedCategories.status === 200) {
+              setCounter(counter + 1);
+              let addedCategories = receivedCategories.data.filters;
+              setAllCategories({ ...allCategories, ...addedCategories });
+            }
+          });
+      });
+    }
   }, []);
 
+  //keep the loading true until all of the categories have been loaded
   useEffect(() => {
-    if (counter === userState.currentUser.categories.length) {
-      setLoading(false);
+    if (currentTeacher) {
+      if (counter === currentTeacher.categories.length) {
+        setLoading(false);
+      }
     }
   }, [counter]);
 
+  //add or remove categories depending on what was selected
   const handleOnChange = (e) => {
-    // if (e.target.value === "Fiction") {
-    //   if (
-    //     state.selectedFilters.find((category) => {
-    //       return category === "Non-Fiction";
-    //     })
-    //   ) {
-    //     setAddFilter(e.target.value);
-    //     setRemoveFilter("Non-Fiction");
-    //   } else {
-    //     setAddFilter(e.target.value);
-    //   }
-    // } else if (e.target.value === "Non-Fiction") {
-    //   if (
-    //     state.selectedFilters.find((category) => {
-    //       return category === "Fiction";
-    //     })
-    //   ) {
-    //     setAddFilter(e.target.value);
-    //     setRemoveFilter("Fiction");
-    //   } else {
-    //     setAddFilter(e.target.value);
-    //   }
-    // } else {
     if (e.target.checked) {
       setAddFilter(e.target.value);
     } else {
       setRemoveFilter(e.target.value);
     }
-    // }
   };
 
   return (
-    loading === false && (
+    loading === false &&
+    allCategories && (
       <Container>
         {Object.keys(allCategories).map((filters, index) => {
           return (
@@ -135,7 +122,7 @@ const FilterOptionContainer = styled.div`
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 2px 15px;
-  max-height: calc(600px - 0.75 * 30vw);
+  /* max-height: calc(600px - 0.75 * 30vw); */
   min-height: ${({ myindex }) => (myindex ? "50px" : "100px")};
   max-width: 98%;
   height: 100%;

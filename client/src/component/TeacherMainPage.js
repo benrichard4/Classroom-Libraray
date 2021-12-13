@@ -12,8 +12,6 @@ const TeacherMainPage = () => {
   // if (isLoading) {
   //   return <div>Loading ...</div>;
   // }
-
-  console.log("CURRENT USER", userState.currentUser);
   return isAuthenticated && userState.currentUser ? (
     <Container>
       {/* if user doesnt have a library prompt them to create one*/}

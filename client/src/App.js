@@ -7,13 +7,12 @@ import HomePage from "./component/HomePage";
 import TeacherMainPage from "./component/TeacherMainPage";
 import Classrooms from "./component/Classroom components/Classrooms";
 import Libraries from "./component/Library Components/Libraries";
-import BookCheckout from "./component/BookCheckout";
-import BookReturn from "./component/BookReturn";
 import CreateClassroom from "./component/Classroom components/CreateClassroom";
 import CreateLibrary from "./component/Library Components/CreateLibrary/CreateLibrary";
 import LibraryAddBook from "./component/Library Components/CreateLibrary/LibraryAddBook";
 import LibrariesBrowse from "./component/Library Components/LibrariesBrowse";
 import ClassroomAddClassList from "./component/Classroom components/ClassroomAddClassList";
+import BookDetail from "./component/Library Components/BookDetail";
 
 const App = () => {
   return (
@@ -49,11 +48,8 @@ const App = () => {
           <Route exact path="/library/:_id">
             <LibrariesBrowse />
           </Route>
-          <Route exact path="/checkout">
-            <BookCheckout />
-          </Route>
-          <Route exact path="/return">
-            <BookReturn />
+          <Route exact path="/library/:_libId/book/:_bookId">
+            <BookDetail />
           </Route>
         </Switch>
       </div>

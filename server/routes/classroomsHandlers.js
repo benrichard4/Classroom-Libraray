@@ -29,7 +29,7 @@ const getAllClassrooms = async (req, res) => {
     } else {
       res
         .status(400)
-        .json({ status: 400, ErrorMsg: "no Classrooms found in db" });
+        .json({ status: 400, errorMsg: "no Classrooms found in db" });
     }
     client.close();
   } catch (e) {
@@ -56,7 +56,38 @@ const getClassroomsById = async (req, res) => {
     } else {
       res.status(400).json({
         status: 400,
-        ErrorMsg: "no classroom found in db with given id",
+        errorMsg: "no classroom found in db with given id",
+      });
+    }
+    client.close();
+  } catch (e) {
+    console.log(e);
+    client.close();
+  }
+};
+
+//GET CLASSROOMS BY LIBRARY ID
+const getClassroomsByLibId = async (req, res) => {
+  const { _libId } = req.params;
+
+  const client = new MongoClient(MONGO_URI, options);
+  await client.connect();
+  try {
+    const db = client.db("ClassLibrary");
+    const foundClassroom = await db
+      .collection("Classrooms")
+      .find({ library_id: _libId })
+      .toArray();
+    if (foundClassroom) {
+      res.status(200).json({
+        status: 200,
+        data: foundClassroom,
+        message: "Classroom found",
+      });
+    } else {
+      res.status(400).json({
+        status: 400,
+        errorMsg: "no classroom found in db with given library id",
       });
     }
     client.close();
@@ -156,6 +187,7 @@ const modifyClassroom = async (req, res) => {};
 module.exports = {
   getAllClassrooms,
   getClassroomsById,
+  getClassroomsByLibId,
   addNewClassroom,
   modifyClassroom,
 };

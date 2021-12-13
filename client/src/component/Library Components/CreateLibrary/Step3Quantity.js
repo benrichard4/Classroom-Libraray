@@ -4,7 +4,7 @@ import styled from "styled-components";
 const Step3Quantity = ({ setQuantityLinedUp, stateQty }) => {
   const [qty, setQty] = useState(null);
   const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  console.log("STATEQTY", stateQty);
+
   return (
     <div>
       <h2> Step 3: Select Quantity Available in Library</h2>

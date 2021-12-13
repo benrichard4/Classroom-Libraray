@@ -20,7 +20,6 @@ const reducer = (userState, action) => {
         status: "loading",
       };
     case "DATA-RECEIVED":
-      console.log("in data-received", action.data);
       return {
         ...userState,
         currentUser: action.data,
@@ -45,7 +44,6 @@ const CurrentUserProvider = ({ children }) => {
   //if it does, get user
   //if it doesn't create user and set info
   useEffect(() => {
-    console.log("in other use effect", user);
     if (user) {
       setLoadingState();
       getTeacherByEmail();
@@ -55,13 +53,10 @@ const CurrentUserProvider = ({ children }) => {
   }, [user]);
 
   const getTeacherByEmail = () => {
-    console.log("in getTeacherByEmail");
-
     fetch(`/teachers/${user.email}`)
       .then((res) => res.json())
       .then((teacherData) => {
         const { status, data, message, errorMsg } = teacherData;
-        console.log("in getTeacherByEmail fetch:", teacherData);
         if (status === 201) {
           receiveCurrentUserDataFromServer(data);
         } else {
@@ -76,8 +71,6 @@ const CurrentUserProvider = ({ children }) => {
   };
   //function that creates a teacher document in teachers collection
   const createTeacherProfile = (email, givenName, surname) => {
-    console.log("in createTeacherProfile");
-    console.log("CREATING NEW TEACHER DOCUMENT");
     fetch(`/teachers`, {
       method: "POST",
       headers: {
@@ -95,7 +88,6 @@ const CurrentUserProvider = ({ children }) => {
     })
       .then((res) => res.json())
       .then((teacherData) => {
-        console.log("in createTeacherProfile fetch:", teacherData);
         const { status, data, message, errorMsg } = teacherData;
         if (status === 201) {
           receiveCurrentUserDataFromServer(data);
@@ -117,13 +109,11 @@ const CurrentUserProvider = ({ children }) => {
 
   //function to change status to LOADING in dispatch
   const setLoadingState = () => {
-    console.log("in setLoadingState");
     dispatch({ type: "LOADING" });
   };
 
   //function to change status to DATA-RECEIVE in dispatch
   const receiveCurrentUserDataFromServer = (data) => {
-    console.log("in receiveCurrentUserDataFromServer", data);
     dispatch({ type: "DATA-RECEIVED", data });
   };
 

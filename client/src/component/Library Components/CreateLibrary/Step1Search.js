@@ -52,11 +52,6 @@ const Step1Search = ({ setBookLinedUp }) => {
     }
   };
 
-  console.log("Maxpages", maxPages);
-  console.log(search);
-  console.log("results", results);
-  console.log("searchType", searchType);
-  console.log("loading", loading);
   return (
     <>
       <FirstContainer>
@@ -115,7 +110,7 @@ export default Step1Search;
 const FirstContainer = styled.div`
   display: flex;
   max-width: 800px;
-  width: 30vw;
+  width: 95%;
   margin: 0 auto;
   flex-direction: column;
   justify-content: flex-start;
@@ -130,12 +125,14 @@ const FormDiv = styled.div`
 const SearchForm = styled.form`
   margin: 20px 15px 20px 15px;
   display: flex;
+  flex-wrap: wrap;
   /* border: 2px solid green; */
   /* justify-content: center; */
 `;
 
 const InputStyled = styled.input`
-  width: 400px;
+  width: 50%; //400px;;
+  /* height: 106px; */
 `;
 
 const SelectStyle = styled.select`

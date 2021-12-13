@@ -77,7 +77,6 @@ const CreateClassroom = () => {
       })
         .then((res) => res.json())
         .then((json) => {
-          console.log("JSON", json);
           if (json.status === 201) {
             getTeacherByEmail();
             setClassId(json.data._id);
@@ -90,7 +89,6 @@ const CreateClassroom = () => {
           }
         })
         .catch((err) => {
-          console.log("error:", err);
           classroomNameFailure();
           return;
         });
@@ -105,7 +103,6 @@ const CreateClassroom = () => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
 
-  console.log("CLASSNAME", className, "LIBARARY", libId);
   return (
     <>
       <Title>Create-a-Classroom</Title>

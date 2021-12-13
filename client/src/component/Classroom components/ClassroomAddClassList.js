@@ -20,7 +20,6 @@ const reducer = (classState, action) => {
         error: null,
       };
     case "ADD-NAMES-SUCCESSFUL":
-      console.log("IN ADD NAMES SUCCESSFUL");
       return {
         ...classState,
         classList: action.classListData,
@@ -35,6 +34,7 @@ const reducer = (classState, action) => {
   }
 };
 
+//component that is for adding a class list to a classroom
 const ClassroomAddClassList = () => {
   const [classState, dispatch] = useReducer(reducer, initialState);
   const [currentClassroom, setCurrentClassroom] = useState(null);
@@ -44,18 +44,15 @@ const ClassroomAddClassList = () => {
 
   useEffect(() => {
     getCurrentClassroom();
-
     getClassList();
   }, []);
 
-  // useEffect(() => {
-  //   getClassList();
-  // }, [_id]);
-
+  //when class size changes, run the setTempClassListFunction
   useEffect(() => {
     setTempClassListFunction();
   }, [classSize]);
 
+  //creates a class list array with object with empty values, ready to be set
   const setTempClassListFunction = () => {
     let arraySet = [];
     for (let i = 1; i <= classSize; i++) {
@@ -63,28 +60,31 @@ const ClassroomAddClassList = () => {
     }
     setTempClassList(arraySet);
   };
+
+  //fetch current classroom
   const getCurrentClassroom = async () => {
     await fetch(`/classrooms/${_id}`)
       .then((res) => res.json())
       .then((ClassroomData) => {
-        console.log("ClassroomData", ClassroomData);
         setCurrentClassroom(ClassroomData.data);
       });
   };
 
+  //adds a first or last name to TempClassList state when a name is typed in the input filed
   const handleOnChange = (index, nameType, e) => {
     let tempArray = [...tempClassList];
     tempArray[index][nameType] = e.target.value;
     setTempClassList(tempArray);
   };
 
+  //when names are submitted to be added to the classlist, the reducer function add student request is called as well as setTempClassListFunction to put the values back to ""
   const handleSubmit = (e) => {
     e.preventDefault();
-
     addStudentRequest();
     setTempClassListFunction();
   };
 
+  //function that posts the students to the student list
   const addStudentRequest = () => {
     let removedBlanksClassList = tempClassList.filter((student) => {
       return student.givenName !== "";
@@ -102,8 +102,6 @@ const ClassroomAddClassList = () => {
       .then((res) => res.json())
       .then((json) => {
         if (json.status === 201) {
-          // getTeacherByEmail();
-          // console.log("IN POST SUCCESS");
           getClassList();
         } else {
           addNamesFailure(json.errorMsg);
@@ -111,30 +109,30 @@ const ClassroomAddClassList = () => {
         }
       })
       .catch((err) => {
-        console.log("error:", err);
         addNamesFailure("Something went wrong");
         return;
       });
   };
 
+  //if the post is successful, get a fresh class list to display
   const getClassList = () => {
     fetch(`/students/classroom/${_id}`)
       .then((res) => res.json())
       .then((classListData) => {
-        console.log("IN FETCH CLASSLIST SUCCESS", classListData.data);
         addNamesSuccess(classListData.data);
       });
   };
 
+  //reducer function for adding names success
   const addNamesSuccess = (classListData) => {
     dispatch({ type: "ADD-NAMES-SUCCESSFUL", classListData: classListData });
   };
 
+  //reducer function for adding names failure
   const addNamesFailure = (message) => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
 
-  console.log("STATECLASSLIST", classState.classList);
   return currentClassroom === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
@@ -227,7 +225,6 @@ const StudentNum = styled.p`
   width: 100px;
   text-align: center;
   font-weight: bold;
-  /* border: 1px solid red; */
 `;
 
 const Input = styled.input`

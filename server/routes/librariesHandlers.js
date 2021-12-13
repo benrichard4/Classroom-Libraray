@@ -182,7 +182,6 @@ const addBookToLibrary = async (req, res) => {
     const db = client.db("ClassLibrary");
     //does library exist?
     const foundLibrary = await db.collection("Libraries").findOne({ _id });
-    console.log(foundLibrary);
     if (foundLibrary === null) {
       res.status(404).json({ status: 404, errorMsg: "Library Not Found" });
     } else {
@@ -216,9 +215,9 @@ const addBookToLibrary = async (req, res) => {
 };
 
 //REMOVE BOOK FROM LIBRARY:
-//body: {bookIsbn}
+//body: {volumeNum}
 const removeBookFromLibrary = async (req, res) => {
-  const isbn = req.body.bookIsbn;
+  const { volumeNum } = req.body;
   const { _id } = req.params;
   const client = new MongoClient(MONGO_URI, options);
   await client.connect();
@@ -229,13 +228,12 @@ const removeBookFromLibrary = async (req, res) => {
 
     //get book Object from library
     const foundBookArray = foundLibrary.library.filter((book) => {
-      return book.bookIsbn === isbn;
+      return book.volumeNum === volumeNum;
     });
     const foundBookObject = foundBookArray[0];
     anyCheckedOut = foundBookObject.isCheckedout.some((element) => {
       return element;
     });
-    console.log(anyCheckedOut);
     if (anyCheckedOut) {
       res.status(400).json({
         status: 400,
@@ -244,11 +242,11 @@ const removeBookFromLibrary = async (req, res) => {
     } else {
       await db
         .collection("Libraries")
-        .updateOne({ _id }, { $pull: { library: { bookIsbn: isbn } } });
+        .updateOne({ _id }, { $pull: { library: { volumeNum: volumeNum } } });
 
       res
         .status(200)
-        .json({ status: 200, message: `Book deleted: isbn${isbn}` });
+        .json({ status: 200, message: `Book deleted: volumeNum${volumeNum}` });
     }
 
     client.close();
@@ -260,101 +258,113 @@ const removeBookFromLibrary = async (req, res) => {
 
 //PATCH CHECKOUT BOOK (FOR MODIFYING BOOKS: CHECKIN/OUT)
 //(in body: {
-//isbn,
-//student_id}
+//volumeNum,
+//student_id,
+//}
 const checkoutBook = async (req, res) => {
   const { _id } = req.params;
   const { student_id } = req.body;
-  const isbn = req.body.bookIsbn;
+  const { volumeNum } = req.body;
   const client = new MongoClient(MONGO_URI, options);
   await client.connect();
   try {
     const db = client.db("ClassLibrary");
-    const foundLibrary = await db.collection("Libraries").findOne({ _id });
-    console.log(foundLibrary);
-    if (foundLibrary) {
-      //does book exist in library? If it does make the change, if not push error
-      const foundBook = await db
-        .collection("Libraries")
-        .findOne({ _id, "library.bookIsbn": isbn }); //, { "library.$": 1 });
-      console.log("foundbook", foundBook);
+    //check if student exists:
+    const foundStudent = await db
+      .collection("Students")
+      .findOne({ _id: student_id });
+    if (foundStudent) {
+      const foundLibrary = await db.collection("Libraries").findOne({ _id });
+      if (foundLibrary) {
+        //does book exist in library? If it does make the change, if not push error
+        const foundBook = await db
+          .collection("Libraries")
+          .findOne({ _id, "library.volumeNum": volumeNum }); //, { "library.$": 1 });
 
-      //get book Object from library
-      const foundBookArray = foundLibrary.library.filter((book) => {
-        return book.bookIsbn === isbn;
-      });
-      console.log(foundBookArray);
-      const foundBookObject = foundBookArray[0];
+        //get book Object from library
+        const foundBookArray = foundLibrary.library.filter((book) => {
+          return book.volumeNum === volumeNum;
+        });
+        const foundBookObject = foundBookArray[0];
 
-      if (foundBook) {
-        // check if there are any copies of books left to checkout
-        if (foundBookObject.qtyAvailable >= 1) {
-          //get value of new checkedout array and set it in the book
-          let newQtyAvailable = foundBookObject.qtyAvailable - 1;
-          let newIsCheckedoutArray = foundBookObject.isCheckedout;
-          let newCheckedOutByArray = foundBookObject.checkedOutBy;
-          let newCheckedOutDateArray = foundBookObject.checkedOutDate;
-          let newReturnDateArray = foundBookObject.returnDate;
-          //get index of first false
-          const indexOfFalse = foundBookObject.isCheckedout.indexOf(false);
-          //replace the first instance of false with true in all new arrays
-          newIsCheckedoutArray[indexOfFalse] = true;
-          newCheckedOutByArray[indexOfFalse] = student_id;
-          //set dates for checkin and return
-          todaysDate = new Date();
-          oneWeekFromNow = new Date();
-          oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-          //update date specific arrays
-          newCheckedOutDateArray[indexOfFalse] = todaysDate.toISOString();
-          newReturnDateArray[indexOfFalse] = oneWeekFromNow.toISOString();
-          //change value in the libraries collection
-          const updatedBookObject = {
-            ...foundBookObject,
-            qtyAvailable: newQtyAvailable,
-            isCheckedout: newIsCheckedoutArray,
-            checkedOutBy: newCheckedOutByArray,
-            checkedOutDate: newCheckedOutDateArray,
-            returnDate: newReturnDateArray,
-          };
-          console.log(updatedBookObject);
-          //update book in library
-          await db
-            .collection("Libraries")
-            .updateOne(
-              { _id, "library.bookIsbn": foundBookObject.bookIsbn },
-              { $set: { "library.$": updatedBookObject } }
-            );
-          //add book to books checked out list in student collection
-          //1st make an array with bookisbn and return date
-          const studentCheckedOutObject = {
-            bookIsbn: foundBookObject.bookIsbn,
-            returnDate: newReturnDateArray[indexOfFalse],
-          };
-          await db
-            .collection("Students")
-            .updateOne(
-              { _id: student_id },
-              { $push: { booksCheckedOut: studentCheckedOutObject } }
-            );
-          return res.status(200).json({
-            status: 200,
-            data: updatedBookObject,
-            message: "Book successfully checked out",
-          });
+        if (foundBook) {
+          // check if there are any copies of books left to checkout
+          if (foundBookObject.qtyAvailable >= 1) {
+            //get value of new checkedout array and set it in the book
+            let newQtyAvailable = foundBookObject.qtyAvailable - 1;
+            let newIsCheckedoutArray = foundBookObject.isCheckedout;
+            let newCheckedOutByArray = foundBookObject.checkedOutBy;
+            let newCheckedOutDateArray = foundBookObject.checkedOutDate;
+            let newReturnDateArray = foundBookObject.returnDate;
+            //get index of first false
+            const indexOfFalse = foundBookObject.isCheckedout.indexOf(false);
+            //replace the first instance of false with true in all new arrays
+            newIsCheckedoutArray[indexOfFalse] = true;
+            let fullName = `${foundStudent.surname}, ${foundStudent.givenName}`;
+            newCheckedOutByArray[indexOfFalse] = {
+              _id: student_id,
+              fullName: fullName,
+            };
+            //set dates for checkin and return
+            todaysDate = new Date();
+            oneWeekFromNow = new Date();
+            oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+            //update date specific arrays
+            newCheckedOutDateArray[indexOfFalse] = todaysDate.toISOString();
+            newReturnDateArray[indexOfFalse] = oneWeekFromNow.toISOString();
+            //change value in the libraries collection
+            const updatedBookObject = {
+              ...foundBookObject,
+              qtyAvailable: newQtyAvailable,
+              isCheckedout: newIsCheckedoutArray,
+              checkedOutBy: newCheckedOutByArray,
+              checkedOutDate: newCheckedOutDateArray,
+              returnDate: newReturnDateArray,
+            };
+            //update book in library
+            await db
+              .collection("Libraries")
+              .updateOne(
+                { _id, "library.volumeNum": foundBookObject.volumeNum },
+                { $set: { "library.$": updatedBookObject } }
+              );
+            //add book to books checked out list in student collection
+            //1st make an array with volumeNum and return date
+            const studentCheckedOutObject = {
+              volumeNum: foundBookObject.volumeNum,
+              title: foundBookObject.title,
+              returnDate: newReturnDateArray[indexOfFalse],
+            };
+            await db
+              .collection("Students")
+              .updateOne(
+                { _id: student_id },
+                { $push: { booksCheckedOut: studentCheckedOutObject } }
+              );
+            return res.status(200).json({
+              status: 200,
+              data: updatedBookObject,
+              message: "Book successfully checked out",
+            });
+          } else {
+            return res
+              .status(400)
+              .json({ status: 400, errorMsg: "No more books to checkout" });
+          }
         } else {
           return res
             .status(400)
-            .json({ status: 400, errorMsg: "No more books to checkout" });
+            .json({ status: 400, errorMsg: "Book volume number not found!" });
         }
       } else {
-        return res
+        res
           .status(400)
-          .json({ status: 400, errorMsg: "Book ISBN not found!" });
+          .json({ status: 400, errorMsg: "no Libraries found in db" });
       }
     } else {
-      res
+      return res
         .status(400)
-        .json({ status: 400, errorMsg: "no Libraries found in db" });
+        .json({ status: 400, errorMsg: "StudentId not found" });
     }
     client.close();
   } catch (e) {
@@ -365,13 +375,13 @@ const checkoutBook = async (req, res) => {
 
 //PATCH CHECKIN BOOK
 //body:{
-//bookIsbn,
+//volumeNum,
 //student_id
 //}
 const checkinBook = async (req, res) => {
   const { _id } = req.params;
   const { student_id } = req.body;
-  const isbn = req.body.bookIsbn;
+  const { volumeNum } = req.body;
   const client = new MongoClient(MONGO_URI, options);
   await client.connect();
   try {
@@ -381,13 +391,14 @@ const checkinBook = async (req, res) => {
     if (foundLibrary) {
       //get book Object from library
       const foundBookArray = foundLibrary.library.filter((book) => {
-        return book.bookIsbn === isbn;
+        return book.volumeNum === volumeNum;
       });
       const foundBookObject = foundBookArray[0];
       //find index of student id in checkedOutBy field
-      const indexOfStudentId = foundBookObject.checkedOutBy.indexOf(student_id);
+      const indexOfStudentId = foundBookObject.checkedOutBy.findIndex(
+        (x) => x._id === student_id
+      );
       //update the key value pairs for new book object
-
       let newQtyAvailable = foundBookObject.qtyAvailable + 1;
       let newIsCheckedoutArray = foundBookObject.isCheckedout;
       let newCheckedOutByArray = foundBookObject.checkedOutBy;
@@ -415,17 +426,17 @@ const checkinBook = async (req, res) => {
       await db
         .collection("Libraries")
         .updateOne(
-          { _id, "library.bookIsbn": foundBookObject.bookIsbn },
+          { _id, "library.volumeNum": foundBookObject.volumeNum },
           { $set: { "library.$": updatedBookObject } }
         );
       //remove book from books checked out list in student collection
-      //1st make an array with bookisbn and return date
+      //1st make an array with volumeNum and return date
 
       await db
         .collection("Students")
         .updateOne(
           { _id: student_id },
-          { $pull: { booksCheckedOut: { bookIsbn: isbn } } }
+          { $pull: { booksCheckedOut: { volumeNum: volumeNum } } }
         );
 
       return res.status(200).json({

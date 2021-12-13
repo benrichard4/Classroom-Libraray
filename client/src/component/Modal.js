@@ -11,38 +11,40 @@ const Modal = ({ isOpen, children, onClose, ...delegated }) => {
   return (
     <>
       <Wrapper isOpen={isOpen} {...delegated}>
-        {/* <CloseButton onClick={onClose}>
-          <VisuallyHidden>Close</VisuallyHidden>
-          <span aria-hidden>
-            <Icon icon={xIcon} size={24} />
-          </span>
-        </CloseButton> */}
+        {onClose && (
+          <CloseButton onClick={onClose}>
+            <VisuallyHidden>Close</VisuallyHidden>
+            <span aria-hidden>
+              <Icon icon={xIcon} size={24} />
+            </span>
+          </CloseButton>
+        )}
         {children}
       </Wrapper>
     </>
   );
 };
 
-// const CloseButton = styled.button`
-//   margin: 0;
-//   padding: 0;
-//   border: none;
-//   background: transparent;
-//   cursor: pointer;
-//   text-align: left;
-//   font: inherit;
+const CloseButton = styled.button`
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
 
-//   position: absolute;
-//   top: 0;
-//   right: 0;
-//   width: 48px;
-//   height: 48px;
-//   transform: translateY(calc(-100% - 16px));
-//   color: white;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-// `;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  transform: translateY(calc(-100% - 16px));
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Wrapper = styled(Dialog)`
   &[data-reach-dialog-content] {

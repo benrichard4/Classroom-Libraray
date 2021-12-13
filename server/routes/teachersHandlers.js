@@ -47,7 +47,6 @@ const getTeacherByEmail = async (req, res) => {
 
     //validate if teacher exists
     const teacherResults = await db.collection("Teachers").findOne({ email });
-    console.log(teacherResults);
     //if teacher exists, send message that teacher is found
     if (teacherResults) {
       res.status(201).json({
@@ -92,7 +91,6 @@ const postNewTeacher = async (req, res) => {
     const db = client.db("ClassLibrary");
     //validate if teacher exists
     const teacherResults = await db.collection("Teachers").findOne({ email });
-    console.log(teacherResults);
     //if teacher exists, send message that it already exists
     if (teacherResults) {
       res.status(400).json({
@@ -171,7 +169,6 @@ const deleteTeacher = async (req, res) => {
           status: 404,
           errorMsg: `no teacher found with email: ${email}`,
         });
-    console.log("woopsie");
     client.close();
   } catch (e) {
     console.log(e);

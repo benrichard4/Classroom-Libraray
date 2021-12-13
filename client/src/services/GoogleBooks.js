@@ -7,8 +7,6 @@ export const getPaginatedSearchResults = (
   maxResults
 ) => {
   let query = "";
-  console.log("search type", searchType);
-  console.log("search string", searchString);
   switch (searchType) {
     case "GeneralSearch":
       query = searchString;
@@ -23,22 +21,9 @@ export const getPaginatedSearchResults = (
 
   let GOOGLE_URL = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${maxResults}&key=${GOOGLE_API_KEY}`;
 
-  console.log("GOOGLE_URL", GOOGLE_URL);
   return fetch(GOOGLE_URL)
     .then((res) => res.json())
     .then((bookdata) => {
-      console.log(bookdata);
       return bookdata.items;
     });
-  //   catch (e) {
-  //     console.log("getPaginatedResults failed:", e);
-  //   }
-};
-
-export const getVolumeResult = async (volumeId) => {
-  let GOOGLE_URL = `https://www.googleapis.com/books/v1/volumes/${volumeId}?key=${GOOGLE_API_KEY}`;
-  try {
-  } catch (e) {
-    console.log("getPaginatedResults failed:", e);
-  }
 };

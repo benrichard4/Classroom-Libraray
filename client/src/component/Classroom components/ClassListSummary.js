@@ -2,9 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import LoadingSpinner from "../LoadingSpinner";
 
+//component that renders the class list summary
 const ClassListSummary = ({ classState }) => {
   return (
-    <SummaryTable>
+    <SummaryTable id="tblData">
       <tr>
         <th>First Name</th>
         <th>Last Name</th>
