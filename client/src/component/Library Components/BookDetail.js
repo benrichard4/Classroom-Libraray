@@ -90,7 +90,7 @@ const BookDetail = () => {
     beginReturn();
   };
 
-  return book === null || allStudents === null || !user ? (
+  return book === null || allStudents === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
     <>
@@ -126,7 +126,9 @@ const BookDetail = () => {
                 </NoClassCheckoutWarning>
               )
             ) : (
-              <button>{"Add to Waiting list (not yet enabled)"}</button>
+              <WaitingListButton>
+                {"Add to Waiting list (not yet enabled)"}
+              </WaitingListButton>
             )}
           </CheckoutContainer>
         </ImgDiv>
@@ -265,6 +267,28 @@ const NoClassCheckoutWarning = styled.div`
 `;
 
 const checkOutReturnButton = styled.button`
+  margin: 5px auto;
+  width: 100px;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  background-color: ${({ disabled }) => (disabled ? "lightgrey" : "darkblue")};
+  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
+  box-shadow: ${({ disabled }) =>
+    disabled ? "default" : "0 0 10px 5px lightblue"};
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 200ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 200ms;
+  }
+`;
+
+const WaitingListButton = styled.button`
   margin: 5px auto;
   width: 100px;
   padding: 15px;

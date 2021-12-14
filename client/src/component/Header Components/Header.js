@@ -34,16 +34,34 @@ const Header = () => {
           <>
             {userState.userType === "teacher" ? (
               <>
-                <QuickLink to="/teacher">
+                <QuickLink
+                  to="/teacher"
+                  activeStyle={{
+                    color: "rgb(168,82,132)",
+                    textDecoration: "underline",
+                  }}
+                >
                   <LinkTitle>Dashboard</LinkTitle>
                 </QuickLink>
               </>
             ) : (
               <>
-                <QuickLink to={`/student/${userState.currentUser._id}`}>
+                <QuickLink
+                  to={`/student/${userState.currentUser._id}`}
+                  activeStyle={{
+                    color: "rgb(168,82,132)",
+                    textDecoration: "underline",
+                  }}
+                >
                   <LinkTitle>Dashboard</LinkTitle>
                 </QuickLink>
-                <QuickLink to={`/library/${userState.studentLibrary}`}>
+                <QuickLink
+                  to={`/library/${userState.studentLibrary}`}
+                  activeStyle={{
+                    color: "rgb(168,82,132)",
+                    textDecoration: "underline",
+                  }}
+                >
                   <LinkTitle>Library</LinkTitle>
                 </QuickLink>
               </>
@@ -105,7 +123,7 @@ const QuickLinksDiv = styled.div`
   bottom: 0;
   left: 5vw;
   /* border: 1px solid red; */
-  width: 65%;
+  width: 400px;
   height: 25%;
   display: flex;
   justify-content: space-around;
@@ -117,6 +135,7 @@ const QuickLink = styled(NavLink)`
   flex-direction: column;
   justify-content: flex-end;
   margin-right: auto;
+  color: black;
   /* border: 1px solid green; */
 `;
 
