@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router";
 import styled from "styled-components";
 
 import { CurrentUserContext } from "../context/CurrentUserContext";
@@ -14,9 +15,11 @@ const initialState = {
   fullLibrary: null,
   filteredLibrary: null,
   error: null,
+  sort: "By Title",
 };
 
 const reducer = (state, action) => {
+  //function that filters the library by the selected filter
   const filterLibraryFunction = (filters, filteredLibrary) => {
     if (filters.length === 0) {
       return state.fullLibrary.library;
@@ -39,11 +42,52 @@ const reducer = (state, action) => {
     }
   };
 
+  const sortListTitle = (list) => {
+    list.sort((a, b) => {
+      if (a.title.toLowerCase() < b.title.toLowerCase()) {
+        return -1;
+      }
+      if (a.title.toLowerCase() > b.title.toLowerCase()) {
+        return 1;
+      }
+      return 0;
+    });
+    return list;
+  };
+
+  const sortListAuthor = (list) => {
+    let stay = list.filter((book) => {
+      return book.author;
+    });
+    console.log("STAY", stay.length);
+    let sorted = list.filter((book) => {
+      return !book.author;
+    });
+    console.log("SORTED", sorted);
+    sorted.sort((a, b) => {
+      if (a.authors[0].toLowerCase() < b.authors[0].toLowerCase()) {
+        return -1;
+      }
+      if (a.authors[0].toLowerCase() > b.authors[0].toLowerCase()) {
+        return 1;
+      }
+      return 0;
+    });
+    console.log("SORTED", sorted);
+    // if (stay.length >= 1) {
+    let newList = [...sorted, ...stay];
+    return newList;
+    // } else {
+    //   return sorted;
+    // }
+  };
+
   switch (action.type) {
     case "PAGE-LOADED":
+      const newFilteredLibrary = sortListTitle(action.library.library);
       return {
         ...state,
-        filteredLibrary: action.library.library,
+        filteredLibrary: newFilteredLibrary,
         fullLibrary: action.library,
         status: "idle",
       };
@@ -76,6 +120,19 @@ const reducer = (state, action) => {
           state.fullLibrary.library
         ),
       };
+    case "SORT-LIBRARY":
+      let newSortedLibrary = [];
+      if (action.sort === "byTitle") {
+        newSortedLibrary = sortListTitle(state.filteredLibrary);
+      } else {
+        newSortedLibrary = sortListAuthor(state.filteredLibrary);
+      }
+      return {
+        ...state,
+        filteredLibrary: newSortedLibrary,
+        sort: action.sort,
+      };
+
     default:
       throw new Error(`${action.type} is not an action`);
   }
@@ -85,6 +142,7 @@ const LibrariesBrowse = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { userState } = useContext(CurrentUserContext);
   const { _id } = useParams();
+  const history = useHistory();
 
   //get the library in question. Then be able to filter it and display the results.
   useEffect(() => {
@@ -107,6 +165,11 @@ const LibrariesBrowse = () => {
     dispatch({ type: "REMOVE-FILTER", filter: filter });
   };
 
+  const sortLibrary = (sort) => {
+    dispatch({ type: "SORT-LIBRARY", sort });
+  };
+
+  console.log("STATE", state);
   return state.fullLibrary === null || userState.currentUser === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
@@ -119,11 +182,27 @@ const LibrariesBrowse = () => {
           <SearchBar
             suggestions={state.fullLibrary.library}
             handleSelect={(suggestion) => {
-              window.alert(suggestion);
+              let foundBook = state.fullLibrary.library.find((book) => {
+                return book.title === suggestion;
+              });
+              history.push(`/library/${_id}/book/${foundBook.volumeNum}`);
             }}
           />
         </SearchDiv>
-        <DropDownDiv>DropDownDiv</DropDownDiv>
+        <DropDownDiv>
+          <DropDownTitle>Sort Alphabetically</DropDownTitle>
+          <StyledSelect
+            value={state.sort}
+            onChange={(e) => {
+              sortLibrary(e.target.value);
+            }}
+          >
+            <option value="byTitle" defaultValue>
+              By Title
+            </option>
+            <option value="byAuthor">By Author</option>
+          </StyledSelect>
+        </DropDownDiv>
       </TopSectionDiv>
       <FilterAndDisplayDiv>
         <SideCategoriesDiv>
@@ -162,9 +241,15 @@ const LibrariesBrowse = () => {
                     </ImgDiv>
                     <BookInfo>Title: {book.title}</BookInfo>
                     <BookInfo>
-                      Author:{" "}
+                      {"Author(s): "}
                       {book.authors
-                        ? book.authors.map((author) => author)
+                        ? book.authors.map((author, index) => {
+                            if (index + 1 === book.authors.length) {
+                              return `${author}`;
+                            } else {
+                              return `${author}, `;
+                            }
+                          })
                         : "N/A"}
                     </BookInfo>
                   </BookLink>
@@ -183,34 +268,46 @@ const Container = styled.div`
   margin-top: 10px;
   width: 80vw;
   max-width: 1200px;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   display: flex;
   flex-direction: column;
   padding: 10px;
 `;
 
 const TopSectionDiv = styled.div`
-  border: 1px solid black;
+  border-bottom: 1px solid silver;
+  padding-bottom: 10px;
   margin: 5px 0;
   display: flex;
 `;
 
 const TitleDiv = styled.div`
-  flex: 3;
+  flex: 6;
   /* border: 1px solid black; */
   margin: 5px 10px;
 `;
 
 const SearchDiv = styled.div`
-  flex: 6;
+  flex: 10;
   /* border: 1px solid black; */
   margin: 5px 0;
 `;
 
 const DropDownDiv = styled.div`
-  flex: 2;
-  border: 1px solid black;
+  flex: 3;
+  /* border: 1px solid black; */
   margin: 5px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex;
+`;
+
+const DropDownTitle = styled.p`
+  font-size: 14px;
+`;
+
+const StyledSelect = styled.select`
+  width: 120px;
 `;
 
 const FilterAndDisplayDiv = styled.div`

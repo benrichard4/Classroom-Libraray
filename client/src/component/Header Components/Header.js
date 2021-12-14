@@ -37,18 +37,6 @@ const Header = () => {
                 <QuickLink to="/teacher">
                   <LinkTitle>Dashboard</LinkTitle>
                 </QuickLink>
-                <QuickLink to="/libraries">
-                  <LinkTitle>Libraries</LinkTitle>
-                </QuickLink>
-                <QuickLink to="/classrooms">
-                  <LinkTitle>Classrooms</LinkTitle>
-                </QuickLink>
-                <QuickLink to="/checkout">
-                  <LinkTitle>Check Out Book</LinkTitle>
-                </QuickLink>
-                <QuickLink to="/return">
-                  <LinkTitle>Return</LinkTitle>
-                </QuickLink>
               </>
             ) : (
               <>
@@ -104,6 +92,8 @@ const HeaderStyle = styled.header`
   height: 120px;
   background-color: lightblue;
   position: relative;
+  padding-top: 20px;
+  padding-left: 30px;
 `;
 
 const CompanyName = styled.h1`
@@ -113,7 +103,7 @@ const CompanyName = styled.h1`
 const QuickLinksDiv = styled.div`
   position: absolute;
   bottom: 0;
-  left: 10vw;
+  left: 5vw;
   /* border: 1px solid red; */
   width: 65%;
   height: 25%;

@@ -39,7 +39,7 @@ const CloseButton = styled.button`
   right: 0;
   width: 48px;
   height: 48px;
-  transform: translateY(calc(-100% - 16px));
+  transform: translateY(calc(-100% - 1px));
   color: white;
   display: flex;
   justify-content: center;

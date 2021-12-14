@@ -90,7 +90,7 @@ const BookDetail = () => {
     beginReturn();
   };
 
-  return book === null || allStudents === null ? (
+  return book === null || allStudents === null || !user ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
     <>
@@ -220,9 +220,9 @@ const Container = styled.div`
   margin: 100px auto;
   width: 60%;
   max-width: 800px;
-  /* height: 50vh; */
-  border: 2px solid black;
-  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px 5px lightblue;
+  padding: 20px;
 `;
 
 const ImgDiv = styled.div`
@@ -247,7 +247,7 @@ const CheckoutContainer = styled.div`
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-around;
-  margin-right: 25px;
+  margin-right: 45px;
 
   /* border: 1px solid pink; */
 `;
@@ -267,13 +267,23 @@ const NoClassCheckoutWarning = styled.div`
 const checkOutReturnButton = styled.button`
   margin: 5px auto;
   width: 100px;
-  padding: 5px;
+  padding: 15px;
   border: none;
   border-radius: 5px;
   color: white;
   cursor: pointer;
   background-color: ${({ disabled }) => (disabled ? "lightgrey" : "darkblue")};
   cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
+  box-shadow: ${({ disabled }) =>
+    disabled ? "default" : "0 0 10px 5px lightblue"};
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 200ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 200ms;
+  }
 `;
 
 const CheckoutButton = styled(checkOutReturnButton)``;

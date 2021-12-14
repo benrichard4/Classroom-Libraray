@@ -49,33 +49,6 @@ const ReturnModal = ({
     }
   }, []);
 
-  //from a book, maps through the students' ids and creates an array of their name and id.
-  // useEffect(() => {
-  //   if (chosenBook) {
-  //     // let studentInfoArr = [];
-
-  //     chosenBook.checkedOutBy.map((studentId, index) => {
-  //       if (studentId) {
-  //         fetch(`/students/${studentId}`)
-  //           .then((res) => res.json())
-  //           .then((StudentData) => {
-  //             let studentObject = [
-  //               {
-  //                 student_id: StudentData.data._id,
-  //                 studentName: `${StudentData.data.surname}, ${StudentData.data.givenName}`,
-  //               },
-  //             ];
-  //             console.log(StudentObject)
-  //             setStudentList([...studentList, ...studentObject]);
-  //             // studentInfoArr.push(studentObject);
-  //           });
-  //       }
-  //     });
-  //     // console.log("STUDENTINFOARR", studentInfoArr);
-  //     // setStudentList(studentInfoArr);
-  //   }
-  // }, [chosenBook]);
-
   useEffect(() => {
     console.log(chosenStudent);
   }, [chosenStudent]);
@@ -99,10 +72,8 @@ const ReturnModal = ({
         .then((res) => res.json())
         .then((json) => {
           if (json.status === 200) {
-            // setStudentList([]);
             setFromBookDetail(null);
             returnSuccessful();
-            // window.location.reload();
             return;
           } else {
             returnFailed(json.errorMsg);
@@ -115,12 +86,9 @@ const ReturnModal = ({
           return;
         });
     } else {
-      console.log("SOMETHING IS WRONG");
     }
   };
 
-  console.log("chosenStudent", chosenStudent);
-  const handleButtonClick = () => {};
   return (
     <Modal
       isOpen={open}
@@ -133,55 +101,100 @@ const ReturnModal = ({
       returnStatus === "loading" ? (
         <LoadingSpinner style={{ marginTop: "50px" }} />
       ) : (
-        [
-          fromBookDetail === true ? (
+        <>
+          {fromBookDetail === true && (
             <form onSubmit={handleSubmit}>
-              <p>
-                <span>Book:</span>
-                {chosenBook.title}
-              </p>
-              <div>
-                {" "}
-                <span> Student: </span>
-                <SelectStyle
-                  value={chosenStudent}
-                  onChange={(e) => setStudent(e.target.value)}
-                >
-                  <option value="">Select a student</option>
+              <Title>Book Return</Title>
+              <ContentDiv>
+                <BookTitle>
+                  <Bold>Book:</Bold>
+                  {chosenBook.title}
+                </BookTitle>
+                <DropDownDiv>
+                  {" "}
+                  <Bold> Student: </Bold>
+                  <SelectStyle
+                    value={chosenStudent}
+                    onChange={(e) => setStudent(e.target.value)}
+                  >
+                    <option value="">Select a student</option>
 
-                  {chosenBook.checkedOutBy.map((student, index) => {
-                    return (
-                      student && (
-                        <React.Fragment key={student._id}>
-                          <option
-                            value={student._id}
-                            defaultValue={index === 0}
-                          >
-                            {student.fullName}
-                          </option>
-                        </React.Fragment>
-                      )
-                    );
-                  })}
-                </SelectStyle>
-              </div>
-              {console.log("!!!!!!", studentList.length)}
-              <button type="submit">Return</button>
+                    {chosenBook.checkedOutBy.map((student, index) => {
+                      return (
+                        student && (
+                          <React.Fragment key={student._id}>
+                            <option
+                              value={student._id}
+                              defaultValue={index === 0}
+                            >
+                              {student.fullName}
+                            </option>
+                          </React.Fragment>
+                        )
+                      );
+                    })}
+                  </SelectStyle>
+                </DropDownDiv>
+              </ContentDiv>
+              <ButtonDiv>
+                <CheckoutButton type="submit">Return</CheckoutButton>
+              </ButtonDiv>
             </form>
-          ) : (
-            <form></form>
-          ),
-          error && <ErrorDiv>Error: {error}</ErrorDiv>,
-        ]
+          )}
+          {error && <ErrorDiv>Error: {error}</ErrorDiv>}
+        </>
       )}
     </Modal>
   );
 };
 
+const Title = styled.h1`
+  margin-bottom: 16px;
+  text-align: center;
+`;
+
+const ContentDiv = styled.div`
+  width: 600px;
+  position: relative;
+`;
+
+const BookTitle = styled.p`
+  margin: 5px;
+  color: darkblue;
+`;
+
+const Bold = styled.span`
+  font-weight: bold;
+`;
+
+const DropDownDiv = styled.div`
+  color: darkblue;
+  margin: 15px;
+  margin-left: 5px;
+`;
+
 const SelectStyle = styled.select`
   padding: 5px 2px;
-  border-left: none;
-  border-right: none;
+`;
+
+const ButtonDiv = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const CheckoutButton = styled.button`
+  border: none;
+  background-color: darkblue;
+  color: white;
+  width: 150px;
+  height: 50px;
+  margin: 30px auto;
+  text-decoration: none;
+  text-align: center;
+  border-radius: 10px;
+  padding: 6px 20px;
+  cursor: pointer;
+  font-size: 17px;
 `;
 
 const ErrorDiv = styled.div`

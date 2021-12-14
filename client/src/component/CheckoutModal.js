@@ -105,32 +105,37 @@ const CheckoutModal = ({
       ) : (
         [
           fromBookDetail === true ? (
-            <form onSubmit={handleSubmit}>
-              <p>
-                <span>Book:</span>
-                {chosenBook.title}
-              </p>
-              <div>
-                {" "}
-                <span> Student: </span>
-                <SelectStyle
-                  value={chosenStudent}
-                  onChange={(e) => setStudent(e.target.value)}
-                >
-                  <option value="" disabled defaultValue>
-                    Select a student
-                  </option>
-                  {chosenClassroom.classList.map((student, index) => {
-                    return (
-                      <React.Fragment key={student._id}>
-                        <option value={student._id}>{student.fullName}</option>
-                      </React.Fragment>
-                    );
-                  })}
-                </SelectStyle>
-              </div>
-              <button type="submit">Checkout</button>
-            </form>
+            <FormStyle onSubmit={handleSubmit}>
+              <Title>Book Checkout</Title>
+              <ContentDiv>
+                <BookTitle>
+                  <Bold>{"Book: "}</Bold>
+                  {chosenBook.title}
+                </BookTitle>
+                <DropDownDiv>
+                  {" "}
+                  <Bold> Student: </Bold>
+                  <SelectStyle
+                    value={chosenStudent}
+                    onChange={(e) => setStudent(e.target.value)}
+                  >
+                    <option value="">Select a student</option>
+                    {chosenClassroom.classList.map((student, index) => {
+                      return (
+                        <React.Fragment key={student._id}>
+                          <option value={student._id}>
+                            {student.fullName}
+                          </option>
+                        </React.Fragment>
+                      );
+                    })}
+                  </SelectStyle>
+                </DropDownDiv>
+              </ContentDiv>
+              <ButtonDiv>
+                <CheckoutButton type="submit">Checkout</CheckoutButton>
+              </ButtonDiv>
+            </FormStyle>
           ) : (
             <form></form>
           ),
@@ -141,10 +146,55 @@ const CheckoutModal = ({
   );
 };
 
+const FormStyle = styled.form``;
+
+const Title = styled.h1`
+  margin-bottom: 16px;
+  text-align: center;
+`;
+
+const ContentDiv = styled.div`
+  width: 600px;
+  position: relative;
+`;
+
+const BookTitle = styled.p`
+  margin: 5px;
+  color: darkblue;
+`;
+
+const Bold = styled.span`
+  font-weight: bold;
+`;
+
+const DropDownDiv = styled.div`
+  color: darkblue;
+  margin: 15px;
+  margin-left: 5px;
+`;
+
 const SelectStyle = styled.select`
   padding: 5px 2px;
-  border-left: none;
-  border-right: none;
+`;
+
+const ButtonDiv = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const CheckoutButton = styled.button`
+  border: none;
+  background-color: darkblue;
+  color: white;
+  width: 150px;
+  height: 50px;
+  margin: 30px auto;
+  text-decoration: none;
+  text-align: center;
+  border-radius: 10px;
+  padding: 6px 20px;
+  cursor: pointer;
+  font-size: 17px;
 `;
 
 const ErrorDiv = styled.div`
