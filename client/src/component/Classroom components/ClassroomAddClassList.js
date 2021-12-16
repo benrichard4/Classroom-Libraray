@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
 import styled from "styled-components";
 import LoadingSpinner from "../LoadingSpinner";
@@ -31,6 +31,8 @@ const reducer = (classState, action) => {
         error: action.message,
         status: "idle",
       };
+    default:
+      throw new Error(`${action.type} is not an action`);
   }
 };
 
@@ -39,7 +41,7 @@ const ClassroomAddClassList = () => {
   const [classState, dispatch] = useReducer(reducer, initialState);
   const [currentClassroom, setCurrentClassroom] = useState(null);
   const [tempClassList, setTempClassList] = useState(null);
-  const [classSize, setClassSize] = useState(15);
+  const [classSize, setClassSize] = useState(14);
   const { _id } = useParams();
 
   useEffect(() => {
@@ -136,7 +138,7 @@ const ClassroomAddClassList = () => {
   return currentClassroom === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
-    <>
+    <OutsideContainer>
       <Title>{currentClassroom.name}: Add a Classlist</Title>
       <Container>
         <Form onSubmit={handleSubmit}>
@@ -172,7 +174,7 @@ const ClassroomAddClassList = () => {
               >
                 -
               </AddRemoveStudentButton>
-              Add Students
+              Add/Remove Inputs
               <AddRemoveStudentButton
                 onClick={() => {
                   setClassSize(classSize + 1);
@@ -192,16 +194,22 @@ const ClassroomAddClassList = () => {
           <ClassListSummary classState={classState} />
         </RightSideContainer>
       </Container>
-    </>
+    </OutsideContainer>
   );
 };
 
+const OutsideContainer = styled.div`
+  min-height: calc(100vh - 180px);
+`;
+
 const Container = styled.div`
-  border: 1px solid silver;
+  /* border: 2px solid blue; */
   display: flex;
   width: 80vw;
-  margin: 10px auto;
-  min-height: 70vh;
+  margin: 10px auto 20px auto;
+  /* min-height: 60vh; */
+  box-shadow: 0 0 10px 5px lightblue;
+  border-radius: 3px;
 `;
 
 const Form = styled.form`
@@ -228,6 +236,7 @@ const StudentNum = styled.p`
   width: 100px;
   text-align: center;
   font-weight: bold;
+  font-size: 16px;
 `;
 
 const Input = styled.input`
@@ -239,8 +248,14 @@ const Input = styled.input`
 `;
 
 const AddRemoveStudentButton = styled.button`
-  margin: 5px auto;
-  padding: 5px 10px;
+  margin: 10px auto;
+  /* padding: 5px 10px; */
+  width: 25px;
+  height: 25px;
+  background-color: darkblue;
+  border: none;
+  border-radius: 3px;
+  color: white;
 `;
 
 const CenterContainer = styled.div`
@@ -253,6 +268,11 @@ const CenterContainer = styled.div`
 
 const PostStudentsButton = styled.button`
   padding: 10px;
+  margin: 0 5px;
+  background-color: darkblue;
+  border: none;
+  border-radius: 3px;
+  color: white;
 `;
 
 const RightSideContainer = styled.div`

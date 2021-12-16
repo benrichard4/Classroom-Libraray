@@ -7,7 +7,9 @@ const Title = ({ children }) => {
 
 const TitleStyle = styled.h1`
   margin-left: 10vw;
-  margin-top: 10px;
+  margin-top: 20px;
+  font-size: 35px;
+  color: darkblue;
 `;
 
 export default Title;

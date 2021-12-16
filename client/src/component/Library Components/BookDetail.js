@@ -53,7 +53,6 @@ const BookDetail = () => {
     fetch(`/classrooms/bylib/${_libId}`)
       .then((res) => res.json())
       .then((ClassroomsData) => {
-        console.log("CLASSROOMDATA", ClassroomsData);
         setClassrooms(ClassroomsData.data);
         filterClassRoomFunction(ClassroomsData.data);
       });
@@ -62,7 +61,6 @@ const BookDetail = () => {
   //if multiple classrooms are assigned to the libId, combine the class lists and set them to classList state
   const filterClassRoomFunction = (classrooms) => {
     let allStudentsArr = [];
-    console.log("CLASSROOMS", classrooms);
     classrooms.forEach((classroom) => {
       classroom.classList.forEach((student) => {
         allStudentsArr.push(student);
@@ -93,7 +91,7 @@ const BookDetail = () => {
   return book === null || allStudents === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
-    <>
+    <OutsideContainer>
       <Container>
         <ImgDiv>
           <BookImg src={book.thumbnail} alt={`${book.title} pic`}></BookImg>
@@ -214,9 +212,14 @@ const BookDetail = () => {
           {`${book.title} successfully returned!`}
         </Alert>
       </Snackbar>
-    </>
+    </OutsideContainer>
   );
 };
+
+const OutsideContainer = styled.div`
+  min-height: calc(100vh - 160px);
+  border: 1px solid white;
+`;
 
 const Container = styled.div`
   margin: 100px auto;
@@ -279,7 +282,7 @@ const checkOutReturnButton = styled.button`
   box-shadow: ${({ disabled }) =>
     disabled ? "default" : "0 0 10px 5px lightblue"};
   &:hover {
-    transform: scale(1.05);
+    transform: ${({ disabled }) => (disabled ? "scale(1)" : "scale(1.05)")};
     transition: ease 200ms;
   }
   &:active {

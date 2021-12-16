@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router";
@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { CurrentUserContext } from "../context/CurrentUserContext";
 import LoadingSpinner from "../LoadingSpinner";
 import SearchBar from "../SearchBar";
-import CategoriesSideBar from "./CategoriesSideBar";
+import CategoriesSideBarCollapsable from "./CategoriesSideBarCollapsable";
 
 const initialState = {
   status: "idle",
@@ -16,6 +16,9 @@ const initialState = {
   filteredLibrary: null,
   error: null,
   sort: "By Title",
+  currentPage: 1,
+  booksPerPage: 9,
+  displayedFromFiltered: null,
 };
 
 const reducer = (state, action) => {
@@ -42,6 +45,7 @@ const reducer = (state, action) => {
     }
   };
 
+  //function that sorts the list by title
   const sortListTitle = (list) => {
     list.sort((a, b) => {
       if (a.title.toLowerCase() < b.title.toLowerCase()) {
@@ -55,15 +59,16 @@ const reducer = (state, action) => {
     return list;
   };
 
+  //function that sorts the list by author
   const sortListAuthor = (list) => {
     let stay = list.filter((book) => {
       return book.author;
     });
-    console.log("STAY", stay.length);
+
     let sorted = list.filter((book) => {
       return !book.author;
     });
-    console.log("SORTED", sorted);
+
     sorted.sort((a, b) => {
       if (a.authors[0].toLowerCase() < b.authors[0].toLowerCase()) {
         return -1;
@@ -73,22 +78,26 @@ const reducer = (state, action) => {
       }
       return 0;
     });
-    console.log("SORTED", sorted);
-    // if (stay.length >= 1) {
+
     let newList = [...sorted, ...stay];
     return newList;
-    // } else {
-    //   return sorted;
-    // }
+  };
+
+  // function that gets the required amount of books to display:
+  const getPaginatedResults = (array, page) => {
+    const indexOfLastBook = page * state.booksPerPage;
+    return array.slice(0, indexOfLastBook);
   };
 
   switch (action.type) {
     case "PAGE-LOADED":
       const newFilteredLibrary = sortListTitle(action.library.library);
+      const paginatedArray = getPaginatedResults(newFilteredLibrary, 1);
       return {
         ...state,
         filteredLibrary: newFilteredLibrary,
         fullLibrary: action.library,
+        displayedFromFiltered: paginatedArray,
         status: "idle",
       };
     case "SET-LOADING":
@@ -98,27 +107,39 @@ const reducer = (state, action) => {
       };
     case "ADD-FILTER":
       let newFilterAdd = [...state.selectedFilters, action.filter];
+      let addFilterLirbrary = filterLibraryFunction(
+        newFilterAdd,
+        state.fullLibrary.library
+      );
+      let addDisplayedLibrary = getPaginatedResults(
+        addFilterLirbrary,
+        state.currentPage
+      );
       return {
         ...state,
         status: "idle",
         selectedFilters: newFilterAdd,
-        filteredLibrary: filterLibraryFunction(
-          newFilterAdd,
-          state.fullLibrary.library
-        ),
+        filteredLibrary: addFilterLirbrary,
+        displayedFromFiltered: addDisplayedLibrary,
       };
     case "REMOVE-FILTER":
       let newFiltersRemove = state.selectedFilters.filter((filterItem) => {
         return filterItem !== action.filter;
       });
+      let removeFilterLibrary = filterLibraryFunction(
+        newFiltersRemove,
+        state.fullLibrary.library
+      );
+      let removeDisplayedLibrary = getPaginatedResults(
+        removeFilterLibrary,
+        state.currentPage
+      );
       return {
         ...state,
         status: "idle",
         selectedFilters: newFiltersRemove,
-        filteredLibrary: filterLibraryFunction(
-          newFiltersRemove,
-          state.fullLibrary.library
-        ),
+        filteredLibrary: removeFilterLibrary,
+        displayedFromFiltered: removeDisplayedLibrary,
       };
     case "SORT-LIBRARY":
       let newSortedLibrary = [];
@@ -127,12 +148,26 @@ const reducer = (state, action) => {
       } else {
         newSortedLibrary = sortListAuthor(state.filteredLibrary);
       }
+      let sortDisplayedLibrary = getPaginatedResults(
+        newSortedLibrary,
+        state.currentPage
+      );
       return {
         ...state,
         filteredLibrary: newSortedLibrary,
+        displayedFromFiltered: sortDisplayedLibrary,
         sort: action.sort,
       };
-
+    case "ADD-PAGE":
+      let newPaginatedArray = getPaginatedResults(
+        state.filteredLibrary,
+        state.currentPage + 1
+      );
+      return {
+        ...state,
+        currentPage: state.currentPage + 1,
+        displayedFromFiltered: newPaginatedArray,
+      };
     default:
       throw new Error(`${action.type} is not an action`);
   }
@@ -153,6 +188,7 @@ const LibrariesBrowse = () => {
       });
   }, []);
 
+  //use effect every time a page is added, to increase
   const setPageLoaded = (library) => {
     dispatch({ type: "PAGE-LOADED", library: library });
   };
@@ -169,14 +205,17 @@ const LibrariesBrowse = () => {
     dispatch({ type: "SORT-LIBRARY", sort });
   };
 
-  console.log("STATE", state);
+  const addPage = () => {
+    dispatch({ type: "ADD-PAGE" });
+  };
+
   return state.fullLibrary === null || userState.currentUser === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
     <Container>
       <TopSectionDiv>
         <TitleDiv>
-          <h2>{state.fullLibrary.name}</h2>
+          <LibraryName>{state.fullLibrary.name}</LibraryName>
         </TitleDiv>
         <SearchDiv>
           <SearchBar
@@ -206,8 +245,8 @@ const LibrariesBrowse = () => {
       </TopSectionDiv>
       <FilterAndDisplayDiv>
         <SideCategoriesDiv>
-          <h3>Categories</h3>
-          <CategoriesSideBar
+          <h3 style={{ marginLeft: "5px" }}>Categories</h3>
+          <CategoriesSideBarCollapsable
             setAddFilter={setAddFilter}
             setRemoveFilter={setRemoveFilter}
             state={state}
@@ -223,7 +262,7 @@ const LibrariesBrowse = () => {
             {state.filteredLibrary.length === 0 ? (
               <h3> No results found</h3>
             ) : (
-              state.filteredLibrary.map((book, index) => {
+              state.displayedFromFiltered.map((book, index) => {
                 return (
                   <BookLink
                     to={`/library/${_id}/book/${book.volumeNum}`}
@@ -257,18 +296,30 @@ const LibrariesBrowse = () => {
               })
             )}
           </BookBox>
+          <Button
+            disabled={
+              state.displayedFromFiltered.length ===
+              state.filteredLibrary.length
+            }
+            onClick={addPage}
+          >
+            More books...
+          </Button>
         </DisplayContainer>
       </FilterAndDisplayDiv>
     </Container>
   );
 };
 
+const LibraryName = styled.h1`
+  font-size: 30px;
+`;
+
 const Container = styled.div`
   margin: 0 auto;
   margin-top: 10px;
   width: 80vw;
   max-width: 1200px;
-  /* border: 1px solid black; */
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -283,19 +334,16 @@ const TopSectionDiv = styled.div`
 
 const TitleDiv = styled.div`
   flex: 6;
-  /* border: 1px solid black; */
   margin: 5px 10px;
 `;
 
 const SearchDiv = styled.div`
   flex: 10;
-  /* border: 1px solid black; */
   margin: 5px 0;
 `;
 
 const DropDownDiv = styled.div`
   flex: 3;
-  /* border: 1px solid black; */
   margin: 5px 0;
   display: flex;
   flex-direction: column;
@@ -311,7 +359,6 @@ const StyledSelect = styled.select`
 `;
 
 const FilterAndDisplayDiv = styled.div`
-  /* border: 1px solid black; */
   margin: 5px 0;
   display: flex;
   padding: 10px;
@@ -319,12 +366,10 @@ const FilterAndDisplayDiv = styled.div`
 
 const SideCategoriesDiv = styled.div`
   flex: 1;
-  /* border: 1px solid black; */
   margin: 5px 0;
 `;
 
 const DisplayContainer = styled.div`
-  /* border: 1px solid black; */
   margin: 5px 0;
   flex: 4;
 `;
@@ -333,9 +378,7 @@ const BookBox = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  /* justify-content: center; */
   align-content: flex-start;
-  /* border: 2px solid red; */
   margin: 5px 3%;
 `;
 
@@ -345,18 +388,18 @@ const BookLink = styled(Link)`
   display: flex;
   flex-direction: column;
   border: 1px solid lightblue;
-  height: 200px;
-  width: 30%; //275px;;
+  height: 240px;
+  width: 30%;
   min-width: 200px;
   margin: 5px;
   padding: 10px;
+  border-radius: 3px;
   &:hover {
     box-shadow: 0 0 5px 1px lightblue;
   }
 `;
 
 const ImgDiv = styled.div`
-  /* border: 1px solid green; */
   width: 100%;
   height: 50%;
   display: flex;
@@ -374,5 +417,15 @@ const BookImg = styled.img`
 const BookInfo = styled.div`
   font-size: calc(12px + 0.3vw);
   margin: 3px 0;
+`;
+
+const Button = styled.button`
+  background-color: ${({ disabled }) => (disabled ? "grey" : "darkblue")};
+  border: none;
+  border-radius: 3px;
+  color: white;
+  padding: 10px;
+  margin: 30px;
+  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
 `;
 export default LibrariesBrowse;

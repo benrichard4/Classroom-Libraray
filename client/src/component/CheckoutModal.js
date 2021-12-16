@@ -1,25 +1,21 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
-import { CgWindows } from "react-icons/cg";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { CheckoutContext } from "./context/CheckoutContext";
 import LoadingSpinner from "./LoadingSpinner";
 import Modal from "./Modal";
 
-//if there isn't an imported teacher it came from book Detail, if there is an importedTeacher, it came from elsewhere.
+//modal for checking out a book
 const CheckoutModal = ({
   importedClassrooms,
   importedBooks,
   importedTeacher,
   open,
 }) => {
-  const [classroomsSelection, setClassroomsSelection] = useState(null);
-  const [fullLibrary, setFullLibrary] = useState(null);
   const [fromBookDetail, setFromBookDetail] = useState(null);
-  const [studentList, setStudentList] = useState(null);
 
   const {
     status,
-    modal,
+
     error,
     chosenClassroom,
     chosenStudent,
@@ -32,24 +28,20 @@ const CheckoutModal = ({
       requestCheckout,
       checkoutSuccessful,
       checkoutFailed,
-      clearSnackbar,
     },
   } = useContext(CheckoutContext);
-  //onLoad we want to either set the classroom, students List with input from bookDetail, or make classrooms a drop down list that creates lists for books and students.
 
+  //set intial states on load
   useEffect(() => {
     if (!importedTeacher) {
       //set classrooms and books state
       setFromBookDetail(true);
       setClassroom(importedClassrooms[0]);
       setBook(importedBooks);
-    } else {
-      //fetch info by teacher
-      setFromBookDetail(false);
-      setClassroomsSelection(importedTeacher.classrooms);
     }
   }, []);
 
+  //function that handles the checkout patch
   const handleSubmit = (e) => {
     e.preventDefault();
     requestCheckout();
@@ -82,15 +74,6 @@ const CheckoutModal = ({
       });
   };
 
-  console.log(
-    "CHOSEN CLASSROOM",
-    chosenClassroom,
-    "FROM BOOK DETAIL",
-    fromBookDetail,
-    "STATUS",
-    status
-  );
-  const handleButtonClick = () => {};
   return (
     <Modal
       isOpen={open}
@@ -151,6 +134,7 @@ const FormStyle = styled.form``;
 const Title = styled.h1`
   margin-bottom: 16px;
   text-align: center;
+  font-size: 35px;
 `;
 
 const ContentDiv = styled.div`

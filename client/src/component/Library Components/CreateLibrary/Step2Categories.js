@@ -1,7 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { CurrentUserContext } from "../../context/CurrentUserContext";
+import LoadingSpinner from "../../LoadingSpinner";
 
+//component that handles step 2 of adding book to library which is selecting categories
 const Step2Categories = ({
   setAddCategory,
   setRemoveCategory,
@@ -15,25 +17,29 @@ const Step2Categories = ({
 
   useEffect(() => {
     //for each category, fetch the information and save it to state
-    userState.currentUser.categories.map((category) => {
-      fetch(`/categories/${category}`)
-        .then((res) => res.json())
-        .then((receivedCategories) => {
-          if (receivedCategories.status === 200) {
-            setCounter(counter + 1);
-            let addedCategories = receivedCategories.data.filters;
-            setAllCategories({ ...allCategories, ...addedCategories });
-          }
-        });
-    });
-  }, []);
+    if (userState.currentUser.categories) {
+      userState.currentUser.categories.forEach((category) => {
+        fetch(`/categories/${category}`)
+          .then((res) => res.json())
+          .then((receivedCategories) => {
+            if (receivedCategories.status === 200) {
+              setCounter(counter + 1);
+              let addedCategories = receivedCategories.data.filters;
+              setAllCategories({ ...allCategories, ...addedCategories });
+            }
+          });
+      });
+    }
+  }, [userState]);
 
+  //keeps track of all the categories, and only set the loading to false if all of the categories have been pushed to state.
   useEffect(() => {
     if (counter === userState.currentUser.categories.length) {
       setLoading(false);
     }
   }, [counter]);
 
+  //function that controls adding the categories from the 1st box to the middle box.
   const handleOnChange = (e) => {
     if (e.target.value === "Fiction") {
       if (
@@ -66,6 +72,7 @@ const Step2Categories = ({
     }
   };
 
+  //"sets" the categories up for when they user is ready to push them to the library
   const handleCompleteOnClick = () => {
     setCategoriesLinedUp();
   };
@@ -79,36 +86,38 @@ const Step2Categories = ({
         </CompleteCategoriesButton>
       </CatTitleDiv>
       {loading ? (
-        <div>Loading...</div>
+        <LoadingSpinner style={{ marginTop: "50px" }} />
       ) : (
         <>
           {Object.keys(allCategories).map((filters, index) => {
             return (
-              <FormStyle key={index}>
-                <FilterName>{filters.toUpperCase()}</FilterName>
-                <Divider />
-                <FilterOptionContainer myindex={index === 0}>
-                  {allCategories[filters].map((filter, index) => {
-                    return (
-                      <FilterOption key={index}>
-                        <input
-                          type={filters === "type" ? "radio" : "checkbox"}
-                          name={filters === "type" ? "type" : filters}
-                          id={filter}
-                          value={filter}
-                          checked={state.categories.find((category) => {
-                            return category === filter;
-                          })}
-                          onChange={(e) => {
-                            handleOnChange(e);
-                          }}
-                        ></input>
-                        <LabelStyle for={filter}>{filter}</LabelStyle>
-                      </FilterOption>
-                    );
-                  })}
-                </FilterOptionContainer>
-              </FormStyle>
+              <React.Fragment key={index}>
+                <FormStyle>
+                  <FilterName>{filters.toUpperCase()}</FilterName>
+                  <Divider />
+                  <FilterOptionContainer myindex={index === 0}>
+                    {allCategories[filters].map((filter, index) => {
+                      return (
+                        <FilterOption key={index}>
+                          <input
+                            type={filters === "type" ? "radio" : "checkbox"}
+                            name={filters === "type" ? "type" : filters}
+                            id={filter}
+                            value={filter}
+                            checked={state.categories.find((category) => {
+                              return category === filter;
+                            })}
+                            onChange={(e) => {
+                              handleOnChange(e);
+                            }}
+                          ></input>
+                          <LabelStyle htmlFor={filter}>{filter}</LabelStyle>
+                        </FilterOption>
+                      );
+                    })}
+                  </FilterOptionContainer>
+                </FormStyle>
+              </React.Fragment>
             );
           })}
         </>
@@ -178,8 +187,19 @@ const LabelStyle = styled.label`
 const CompleteCategoriesButton = styled.button`
   padding: 10px;
   cursor: pointer;
-
+  background-color: darkblue;
+  border: none;
+  border-radius: 3px;
   top: 0;
+  color: white;
+  &:hover {
+    transform: scale(1.03);
+    transition: ease 200ms;
+  }
+  &:active {
+    transform: scale(0.97);
+    transition: ease 200ms;
+  }
 `;
 
 export default Step2Categories;

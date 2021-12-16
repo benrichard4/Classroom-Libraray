@@ -26,6 +26,7 @@ const SearchBar = ({ suggestions, handleSelect }) => {
       <Container>
         <Input
           type="text"
+          placeholder="Search by title"
           value={value}
           onChange={(ev) => setValue(ev.target.value)}
           onKeyDown={(ev) => {
@@ -126,7 +127,7 @@ const Input = styled.input`
 const Button = styled.button`
   border: none;
   border-radius: 3px;
-  background-color: blue;
+  background-color: darkblue;
   color: white;
   height: 30px;
   width: 80px;
@@ -145,23 +146,10 @@ const UnorderedList = styled.ul`
 `;
 const Suggestion = styled.li`
   padding: 10px;
-
-  /* &:hover {
-    background-color: rgb(255, 250, 228);
-  } */
 `;
 
 const Prediction = styled.span`
   font-weight: bold;
 `;
-
-const InSpan = styled.span`
-  font-size: 12px;
-  font-style: italic;
-`;
-
-// const CategorySpan = styled.span`
-//   color: purple;
-// `;
 
 export default SearchBar;

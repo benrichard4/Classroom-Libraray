@@ -7,6 +7,7 @@ import { x as xIcon } from "react-icons-kit/feather/x";
 
 import "@reach/dialog/styles.css";
 
+//component that defines the base modal styles.
 const Modal = ({ isOpen, children, onClose, ...delegated }) => {
   return (
     <>
@@ -50,6 +51,7 @@ const Wrapper = styled(Dialog)`
   &[data-reach-dialog-content] {
     position: relative;
     color: black;
+    border-radius: 5px;
   }
 `;
 

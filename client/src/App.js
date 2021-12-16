@@ -1,12 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import styled from "styled-components";
 import GlobalStyles from "./component/GlobalStyles";
 import Header from "./component/Header Components/Header";
 import HomePage from "./component/HomePage";
 import TeacherMainPage from "./component/TeacherMainPage";
-import Classrooms from "./component/Classroom components/Classrooms";
-import Libraries from "./component/Library Components/Libraries";
 import CreateClassroom from "./component/Classroom components/CreateClassroom";
 import CreateLibrary from "./component/Library Components/CreateLibrary/CreateLibrary";
 import LibraryAddBook from "./component/Library Components/CreateLibrary/LibraryAddBook";
@@ -15,6 +12,8 @@ import ClassroomAddClassList from "./component/Classroom components/ClassroomAdd
 import BookDetail from "./component/Library Components/BookDetail";
 import StudentLoginPage from "./component/Students/StudentLoginPage";
 import StudentMainPage from "./component/Students/StudentMainPage";
+import AboutPage from "./component/AboutPage";
+import Footer from "./Footer";
 
 const App = () => {
   return (
@@ -25,6 +24,9 @@ const App = () => {
         <Switch>
           <Route exact path="/">
             <HomePage />
+          </Route>
+          <Route exact path="/about">
+            <AboutPage />
           </Route>
           <Route exact path="/student/login">
             <StudentLoginPage />
@@ -47,12 +49,6 @@ const App = () => {
           <Route exact path="/library/:_id/addbook">
             <LibraryAddBook />
           </Route>
-          <Route exact path="/classrooms">
-            <Classrooms />
-          </Route>
-          <Route exact path="/libraries">
-            <Libraries />
-          </Route>
           <Route exact path="/library/:_id">
             <LibrariesBrowse />
           </Route>
@@ -61,6 +57,7 @@ const App = () => {
           </Route>
         </Switch>
       </div>
+      <Footer />
     </Router>
   );
 };

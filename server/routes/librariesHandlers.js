@@ -485,7 +485,9 @@ const changeQty = async (req, res) => {
 //PATCH ADD STUDENT TO WAITING LIST
 const addToWaitingList = async (req, res) => {};
 
-const deleteLibrary = async (req, res) => {};
+const deleteLibrary = async (req, res) => {
+  //check if any books are taken out. Cannot delete library if a book is checked out.
+};
 
 module.exports = {
   getAllLibraries,

@@ -13,6 +13,19 @@ const StudentLoginButton = () => {
 export default StudentLoginButton;
 
 const LoginButtonStyle = styled.button`
-  height: 30px;
   font-size: 20px;
+  background-color: darkblue;
+  border: none;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 100ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 100ms;
+  }
 `;

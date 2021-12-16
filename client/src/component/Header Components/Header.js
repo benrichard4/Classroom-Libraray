@@ -4,14 +4,16 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 
-import { CgProfile, CgWindows } from "react-icons/cg";
+import { CgProfile } from "react-icons/cg";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 import StudentLoginButton from "./StudentLoginButton";
 import { CurrentUserContext } from "../context/CurrentUserContext";
+import Logo from "../../assets/logo-booknook.png";
 
+//component for displaying the header
 const Header = () => {
-  const { isAuthenticated, isLoading, user } = useAuth0();
+  const { isAuthenticated, user } = useAuth0();
   const history = useHistory();
   const {
     userState,
@@ -20,62 +22,131 @@ const Header = () => {
     actions: { setLoggedOutState },
   } = useContext(CurrentUserContext);
 
-  console.log(
-    "userState.userType",
-    userState.userType,
-    "currentSudent",
-    currentStudent
-  );
   return (
     <HeaderStyle>
-      <CompanyName>BookNook</CompanyName>
+      <HeaderTitle>
+        <CompanyName>
+          <FirstLetter>B</FirstLetter>ook<FirstLetter>N</FirstLetter>ook{" "}
+        </CompanyName>
+        <LogoImg
+          src={Logo}
+          alt="logodashboard
+                  "
+        ></LogoImg>
+      </HeaderTitle>
       <QuickLinksDiv>
-        {userState.userType && (
+        {userState.userType ? (
           <>
             {userState.userType === "teacher" ? (
               <>
                 <QuickLink
+                  exact
+                  to={`/`}
+                  activeStyle={{
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
+                  }}
+                >
+                  <LinkTitle>Homepage</LinkTitle>
+                </QuickLink>
+
+                <QuickLink
                   to="/teacher"
                   activeStyle={{
-                    color: "rgb(168,82,132)",
-                    textDecoration: "underline",
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
                   }}
                 >
                   <LinkTitle>Dashboard</LinkTitle>
+                </QuickLink>
+                <QuickLink
+                  to={`/about`}
+                  activeStyle={{
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
+                  }}
+                >
+                  <LinkTitle>About</LinkTitle>
                 </QuickLink>
               </>
             ) : (
               <>
                 <QuickLink
-                  to={`/student/${userState.currentUser._id}`}
+                  exact
+                  to={`/`}
                   activeStyle={{
-                    color: "rgb(168,82,132)",
-                    textDecoration: "underline",
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
                   }}
                 >
-                  <LinkTitle>Dashboard</LinkTitle>
+                  <LinkTitle>Homepage</LinkTitle>
+                </QuickLink>
+                <QuickLink
+                  to={`/student/${userState.currentUser._id}`}
+                  activeStyle={{
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
+                  }}
+                >
+                  <LinkTitle>Overview</LinkTitle>
                 </QuickLink>
                 <QuickLink
                   to={`/library/${userState.studentLibrary}`}
                   activeStyle={{
-                    color: "rgb(168,82,132)",
-                    textDecoration: "underline",
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
                   }}
                 >
                   <LinkTitle>Library</LinkTitle>
                 </QuickLink>
+                <QuickLink
+                  to={`/about`}
+                  activeStyle={{
+                    color: "indigo",
+                    borderBottom: "2px solid indigo",
+                  }}
+                >
+                  <LinkTitle>About</LinkTitle>
+                </QuickLink>
               </>
             )}
+          </>
+        ) : (
+          <>
+            <QuickLink
+              exact
+              to={`/`}
+              activeStyle={{
+                color: "indigo",
+                borderBottom: "2px solid indigo",
+              }}
+            >
+              <LinkTitle>Homepage</LinkTitle>
+            </QuickLink>
+            <QuickLink
+              to={`/about`}
+              activeStyle={{
+                color: "indigo",
+                borderBottom: "2px solid indigo",
+              }}
+            >
+              <LinkTitle>About</LinkTitle>
+            </QuickLink>
           </>
         )}
       </QuickLinksDiv>
       <LoginContainer>
         {isAuthenticated ? (
-          <>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <CgProfileStyle />
-            <LogoutButton />
-            <div> Signed in as: {user.name ? user.name : user.email}</div>
-          </>
+            <div style={{ width: "200px" }}>
+              <LogoutButton />
+              <div style={{ fontSize: "15px", marginTop: "5px" }}>
+                {" "}
+                Signed in as: {user.name ? user.name : user.email}
+              </div>
+            </div>
+          </div>
         ) : (userState.userType === null) & !currentStudent ? (
           <>
             <LoginButton />
@@ -93,36 +164,63 @@ const Header = () => {
                   history.push(`/`);
                 }}
               >
-                LOGOUT
+                Logout
               </StudentLogoutButton>
               <div> Hi, {userState.currentUser.givenName}!</div>
             </>
           )
         )}
       </LoginContainer>
+      {isAuthenticated ? (
+        <TypeTitle>Teacher's Nook</TypeTitle>
+      ) : (
+        userState.userType !== null &&
+        currentStudent && <TypeTitle>Student's Nook</TypeTitle>
+      )}
     </HeaderStyle>
   );
 };
 
-export default Header;
-
 const HeaderStyle = styled.header`
-  height: 120px;
+  height: 100px;
   background-color: lightblue;
   position: relative;
   padding-top: 20px;
   padding-left: 30px;
+  padding-right: 30px;
+`;
+
+const TypeTitle = styled.h1`
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 25px;
+`;
+
+const HeaderTitle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0 10px;
+`;
+
+const LogoImg = styled.img`
+  width: 50px;
 `;
 
 const CompanyName = styled.h1`
-  margin: 0 auto;
+  text-align: center;
+  font-size: 40px;
+`;
+
+const FirstLetter = styled.span`
+  color: darkblue;
 `;
 
 const QuickLinksDiv = styled.div`
   position: absolute;
   bottom: 0;
   left: 5vw;
-  /* border: 1px solid red; */
   width: 400px;
   height: 25%;
   display: flex;
@@ -136,7 +234,6 @@ const QuickLink = styled(NavLink)`
   justify-content: flex-end;
   margin-right: auto;
   color: black;
-  /* border: 1px solid green; */
 `;
 
 const LinkTitle = styled.div`
@@ -156,9 +253,26 @@ const LoginContainer = styled.div`
 `;
 
 const CgProfileStyle = styled(CgProfile)`
-  font-size: 30px;
+  font-size: 40px;
+  margin-right: 20px;
 `;
 
 const StudentLogoutButton = styled.button`
   font-size: 20px;
+  background-color: darkblue;
+  border: none;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 100ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 100ms;
+  }
 `;
+
+export default Header;

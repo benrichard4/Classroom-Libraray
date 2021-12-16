@@ -3,8 +3,11 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Modal from "./Modal";
 
+//component the defines the success modal for when a library or classroom is successfully created.
 const SuccessModal = ({ type, importedState, importedId }) => {
   const [state, setState] = useState(null);
+
+  //on load, check to see if the success is for a library or classroom creation. Sets the approriate responses.
   useEffect(() => {
     if (type === "library") {
       const libState = {
@@ -61,7 +64,6 @@ const Title = styled.h1`
 
 const ButtonPlacement = styled.div`
   display: flex;
-  /* flex-direction: column; */
   justify-content: center;
   align-items: center;
 `;
@@ -76,7 +78,6 @@ const Button = styled(Link)`
   text-decoration: none;
   text-align: center;
   border-radius: 10px;
-  padding: 6px 20px;
 `;
 
 export default SuccessModal;

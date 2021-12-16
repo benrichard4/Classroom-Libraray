@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
+//component for the displayed search result of the google API
 const Step1SearchResult = ({ result, index, setBookLinedUp }) => {
   const handleOnClick = () => {
     //create book info to push into setBookLinedUp
@@ -54,44 +55,48 @@ const Step1SearchResult = ({ result, index, setBookLinedUp }) => {
         <p>Image not Found</p>
       )}
       <InfoDiv>
-        <p>
+        <BookInfo>
           Title: {result.volumeInfo.title ? result.volumeInfo.title : "N/A"}
-        </p>
-        <p>
+        </BookInfo>
+        <BookInfo>
           {"Author(s):"}{" "}
           {result.volumeInfo.authors
             ? result.volumeInfo.authors.map((author) => {
                 return author;
               })
             : "N/A"}
-        </p>
+        </BookInfo>
         {result.volumeInfo.industryIdentifiers
           ? result.volumeInfo.industryIdentifiers.map((industryIdentifier) => {
               return (
-                <p>
+                <BookInfo>
                   {industryIdentifier.type}
                   {": "}
                   {industryIdentifier.identifier}
-                </p>
+                </BookInfo>
               );
             })
           : null}
-        <p>
+        <BookInfo>
           Publisher:{" "}
           {result.volumeInfo.publisher ? result.volumeInfo.publisher : "N/A"}
-        </p>
-        <p>
+        </BookInfo>
+        <BookInfo>
           Published Date:{" "}
           {result.volumeInfo.publishedDate
             ? result.volumeInfo.publishedDate
             : "N/A"}
-        </p>
+        </BookInfo>
       </InfoDiv>
     </ResultButton>
   );
 };
 
 export default Step1SearchResult;
+
+const BookInfo = styled.p`
+  font-size: calc(17px - 0.03vw);
+`;
 
 const ResultButton = styled.button`
   background-color: transparent;

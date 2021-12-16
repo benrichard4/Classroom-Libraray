@@ -1,25 +1,20 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { ReturnContext } from "./context/ReturnContext";
 import LoadingSpinner from "./LoadingSpinner";
 import Modal from "./Modal";
 
-//if there isn't an imported teacher it came from book Detail, if there is an importedTeacher, it came from elsewhere.
+//component that renders the return modal
 const ReturnModal = ({
   importedBooks,
   importedTeacher,
   importedClassrooms,
   open,
 }) => {
-  const [classroomsSelection, setClassroomsSelection] = useState(null);
-  const [fullLibrary, setFullLibrary] = useState(null);
   const [fromBookDetail, setFromBookDetail] = useState(null);
-  const [studentList, setStudentList] = useState([]);
-  const [count, setCount] = useState(0);
 
   const {
     returnStatus,
-    modal,
     error,
     chosenClassroom,
     chosenStudent,
@@ -34,7 +29,6 @@ const ReturnModal = ({
       returnFailed,
     },
   } = useContext(ReturnContext);
-  //onLoad we want to either set the classroom, students List with input from bookDetail, or make classrooms a drop down list that creates lists for books and students.
 
   useEffect(() => {
     if (!importedTeacher) {
@@ -42,21 +36,13 @@ const ReturnModal = ({
       setFromBookDetail(true);
       setClassroom(importedClassrooms[0]);
       setBook(importedBooks);
-    } else {
-      //fetch info by teacher
-      setFromBookDetail(false);
-      setClassroomsSelection(importedTeacher.classrooms);
     }
   }, []);
 
-  useEffect(() => {
-    console.log(chosenStudent);
-  }, [chosenStudent]);
-
+  //function that runs the patch that returns a book
   const handleSubmit = (e) => {
     e.preventDefault();
     requestReturn();
-    console.log("RIGHTBEOFREPATCH", chosenBook.volumeNum, chosenStudent);
     if (chosenBook.volumeNum && chosenStudent) {
       fetch(`/libraries/${chosenClassroom.library_id}/checkin`, {
         method: "PATCH",
@@ -107,7 +93,7 @@ const ReturnModal = ({
               <Title>Book Return</Title>
               <ContentDiv>
                 <BookTitle>
-                  <Bold>Book:</Bold>
+                  <Bold>{"Book: "}</Bold>
                   {chosenBook.title}
                 </BookTitle>
                 <DropDownDiv>
@@ -151,6 +137,7 @@ const ReturnModal = ({
 const Title = styled.h1`
   margin-bottom: 16px;
   text-align: center;
+  font-size: 35px;
 `;
 
 const ContentDiv = styled.div`

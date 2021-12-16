@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useReducer, useState } from "react";
 import styled from "styled-components";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useHistory } from "react-router";
 
 import { CurrentUserContext } from "../context/CurrentUserContext";
 import { Link } from "react-router-dom";
@@ -32,31 +31,37 @@ const reducer = (state, action) => {
         error: action.message,
         status: "idle",
       };
+    default:
+      throw new Error(`${action.type} is not an action`);
   }
 };
 
+//component for creating a classroom
 const CreateClassroom = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [className, setClassName] = useState("");
   const [classId, setClassId] = useState("");
   const [libId, setLibId] = useState(null);
   const { user } = useAuth0();
-  const history = useHistory();
   const { userState, getTeacherByEmail } = useContext(CurrentUserContext);
 
+  //when value in input changes, assign it to state className
   const handleOnChange = (data) => {
     setClassName(data);
   };
 
+  //when a library is chsoen from the drop down, assign it to state libId.
   const handleLibraryIdSelect = (e) => {
     setLibId(e.target.value);
   };
 
+  //when the form is submitted, call the function classroomNameRequest
   const handleSubmit = (e) => {
     e.preventDefault();
     classroomNameRequest();
   };
 
+  //function that posts (creates) a new classroom.
   const classroomNameRequest = () => {
     dispatch({ type: "CLASSROOM-NAME-REQUEST" });
     if (libId === null || className === null) {
@@ -82,7 +87,6 @@ const CreateClassroom = () => {
             setClassId(json.data._id);
             classroomNameSuccess();
             return;
-            // history.push(`/classroom/${json.data._id}/addclasslist`);
           } else {
             classroomNameFailure(json.errorMsg);
             return;
@@ -95,6 +99,7 @@ const CreateClassroom = () => {
     }
   };
 
+  //reducer functions below
   const classroomNameSuccess = () => {
     dispatch({ type: "CLASSROOM-NAME-SUCCESSFUL" });
   };
@@ -114,35 +119,41 @@ const CreateClassroom = () => {
           </p>
           <p>
             If you haven't created a Library yet, or haven't created one for
-            this classroom, <Link to="/library/create">click here</Link> to
-            Create-a-Library
+            this classroom,{" "}
+            <Link style={{ color: "blue" }} to="/library/create">
+              click here
+            </Link>{" "}
+            to Create-a-Library
           </p>
           <FormStyle onSubmit={handleSubmit}>
-            <InputStyle
-              type="text"
-              onChange={(e) => handleOnChange(e.target.value)}
-              value={className}
-              autoFocus
-              placeholder="Name your classroom"
-            ></InputStyle>
-            <div>
-              <SelectStyle value={libId} onChange={handleLibraryIdSelect}>
-                <option value="" disabled selected>
-                  Select a Library to link
-                </option>
-                {userState.currentUser.libraries.map((library, index) => {
-                  return (
-                    <option key={index} value={library._id}>
-                      {library.name}
-                    </option>
-                  );
-                })}
-              </SelectStyle>
-            </div>
             {state.status === "loading" ? (
               <div>loading...</div>
             ) : (
-              <button type="submit">Create Classroom</button>
+              <>
+                <InputStyle
+                  type="text"
+                  onChange={(e) => handleOnChange(e.target.value)}
+                  value={className}
+                  autoFocus
+                  placeholder="Type Classroom Name..."
+                ></InputStyle>
+                <div>
+                  <SelectStyle value={libId} onChange={handleLibraryIdSelect}>
+                    <option value="" disabled selected>
+                      Select a Library to link
+                    </option>
+                    {userState.currentUser.libraries.map((library, index) => {
+                      return (
+                        <option key={index} value={library._id}>
+                          {library.name}
+                        </option>
+                      );
+                    })}
+                  </SelectStyle>
+                </div>
+
+                <Button type="submit">Create Classroom</Button>
+              </>
             )}
           </FormStyle>
         </>
@@ -162,7 +173,6 @@ const CreateClassroom = () => {
 
 const Container = styled.div`
   max-width: 80vw;
-  /* min-height: 70vh; */
   display: flex;
   flex-direction: column;
   flex: 3;
@@ -171,18 +181,36 @@ const Container = styled.div`
 
 const FormStyle = styled.form`
   display: flex;
-  margin: 20px 0;
+  margin: 30px 0;
 `;
 
 const SelectStyle = styled.select`
   padding: 5px 2px;
   border-left: none;
-  border-right: none;
 `;
 
 const InputStyle = styled.input`
   width: 400px;
   padding-left: 5px;
+`;
+
+const Button = styled.button`
+  font-size: 20px;
+  background-color: darkblue;
+  border: none;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin: 0 10px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 100ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 100ms;
+  }
 `;
 
 const ErrorDiv = styled.div`

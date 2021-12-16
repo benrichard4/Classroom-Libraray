@@ -18,4 +18,19 @@ export default LogoutButton;
 
 const LogoutButtonStyle = styled.button`
   font-size: 20px;
+  background-color: darkblue;
+  border: none;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 3px;
+  width: 100%;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 100ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 100ms;
+  }
 `;

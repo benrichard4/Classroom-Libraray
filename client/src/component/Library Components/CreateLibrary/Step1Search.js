@@ -4,6 +4,7 @@ import LoadingSpinner from "../../LoadingSpinner";
 import { getPaginatedSearchResults } from "../../../services/GoogleBooks";
 import Step1SearchResult from "./Step1SearchResult";
 
+//component that searches for books using the google api
 const Step1Search = ({ setBookLinedUp }) => {
   const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("GeneralSearch");
@@ -11,14 +12,17 @@ const Step1Search = ({ setBookLinedUp }) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  //function that handles the search state when something is typed innto input
   const handleOnChange = (data) => {
     setSearch(data);
   };
 
+  //changes the state of the type of search from dropdown
   const handleSearchTypeSelect = (e) => {
     setSearchType(e.target.value);
   };
 
+  //funciton that handles the submitting of what was in input and dropdown to search through google api. max pages has to go with how many results are displayed at a time
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -33,15 +37,19 @@ const Step1Search = ({ setBookLinedUp }) => {
     setLoading(false);
   };
 
+  //function that shows more results
   const handleLoadMoreButton = () => {
     setMaxPages(maxPages + maxPages);
   };
 
+  //when max pages changes, run function that gets information from google api
   useEffect(() => {
-    let modifiedsearch = search.split(" ").join("+");
-    getPaginatedSearchResults(searchType, modifiedsearch, 0, maxPages).then(
-      (data) => setResults(data)
-    );
+    if (search) {
+      let modifiedsearch = search.split(" ").join("+");
+      getPaginatedSearchResults(searchType, modifiedsearch, 0, maxPages).then(
+        (data) => setResults(data)
+      );
+    }
   }, [maxPages]);
 
   //If the enter key is pressed in the input box, then the handleClick function is called
@@ -55,7 +63,7 @@ const Step1Search = ({ setBookLinedUp }) => {
   return (
     <>
       <FirstContainer>
-        <h2>Step 1: Find and choose Book</h2>
+        <SubTitle>Step 1: Find and choose Book</SubTitle>
         <FormDiv>
           <SearchForm onSubmit={handleSubmit}>
             <InputStyled
@@ -74,7 +82,7 @@ const Step1Search = ({ setBookLinedUp }) => {
                 <option value="TitleSearch">By Title</option>
               </SelectStyle>
             </div>
-            <button type="submit">Search</button>
+            <SearchButton type="submit">Search</SearchButton>
           </SearchForm>
         </FormDiv>
         {loading ? (
@@ -114,25 +122,22 @@ const FirstContainer = styled.div`
   margin: 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  /* border: 2px solid blue; */
-  /* align-items:flex-start; */
 `;
 
-const FormDiv = styled.div`
-  /* border: 2px solid pink; */
+const SubTitle = styled.h2`
+  margin-top: 10px;
 `;
+const FormDiv = styled.div``;
 
 const SearchForm = styled.form`
   margin: 20px 15px 20px 15px;
   display: flex;
   flex-wrap: wrap;
-  /* border: 2px solid green; */
-  /* justify-content: center; */
 `;
 
 const InputStyled = styled.input`
-  width: 50%; //400px;;
-  /* height: 106px; */
+  width: 50%;
+  padding-left: 10px;
 `;
 
 const SelectStyle = styled.select`
@@ -141,23 +146,25 @@ const SelectStyle = styled.select`
   border-right: none;
 `;
 
+const SearchButton = styled.button`
+  padding: 5px 15px;
+  background-color: darkblue;
+  border: none;
+  border-radius: 3px;
+  color: white;
+`;
+
 const ResultsWrapper = styled.div`
-  /* max-width: 600px; */
   display: flex;
   flex-direction: column;
-  /* flex-wrap: wrap; */
   margin: 0 auto;
-  /* border: 2px solid red; */
 `;
 
 const ResultDiv = styled.div`
   padding: 10px;
-  /* padding-bottom: 40px; */
   margin: 10px;
   border: 1px solid silver;
-  /* width: 25%; */
   display: flex;
-  /* flex-direction: column; */
 
   &:last-child {
     border: none;
@@ -165,6 +172,15 @@ const ResultDiv = styled.div`
 `;
 
 const LoadMoreButton = styled.button`
-  padding: 5px;
-  font-size: 0.55vw;
+  padding: 5px 15px;
+  font-size: calc(10px + 0.3vw);
+  background-color: darkblue;
+  border: none;
+  border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.05);
+    transition: ease 100ms;
+  }
 `;

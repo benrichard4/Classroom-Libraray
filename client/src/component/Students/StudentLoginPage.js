@@ -40,7 +40,6 @@ const StudentLoginPage = () => {
     })
       .then((res) => res.json())
       .then((studentData) => {
-        console.log("INSIDE STUDENT LOGIN, CLASSROOMID:", studentData.status);
         if (studentData.status === 200) {
           receiveStudentDataFromServer(studentData.data);
           setCurrentStudent(studentData.data._id);
@@ -61,12 +60,11 @@ const StudentLoginPage = () => {
   //   If the enter key is pressed in the input box, then the handleClick function is called
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      //   handleClick();
-      console.log("username", username, "password", password);
+      handleClick();
       return;
     }
   };
-  console.log("USERSTATE", userState);
+
   return (
     <Content>
       <SignInContainer>
@@ -78,7 +76,7 @@ const StudentLoginPage = () => {
           autoFocus
         ></NameInput>
         <PasswordInput
-          type="text"
+          type="password"
           placeholder="Password"
           onChange={(e) => handlePasswordChange(e.target.value)}
           value={password}
@@ -94,7 +92,7 @@ const StudentLoginPage = () => {
 
 const Content = styled.div`
   /* background-image: url("../images/PaintingOffice.jpg"); */
-  border: 1px solid black;
+  /* border: 1px solid black; */
   height: calc(100vh - 120px);
   background-position: center;
   background-repeat: no-repeat;
@@ -113,6 +111,7 @@ const SignInContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 305px;
+  box-shadow: 0 0 10px 5px silver;
 `;
 
 const NameInput = styled.input`
@@ -148,9 +147,11 @@ const Button = styled.button`
   border: none;
   padding: 5px;
   font-size: 17px;
-  font-family: Impact, sans-serif;
-  color: silver;
+  font-weight: bold;
+  font-family: "Cambria", sans-serif;
+  color: white;
   margin: 2px;
+  width: 230px;
 
   &:hover {
     cursor: pointer;

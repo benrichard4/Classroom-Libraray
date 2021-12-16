@@ -62,9 +62,12 @@ const reducer = (userState, action) => {
   }
 };
 
+//component that holds the context for the current user. Works for teacher and students
 const CurrentUserProvider = ({ children }) => {
   const { user } = useAuth0();
   const [userState, dispatch] = useReducer(reducer, userInitialState);
+
+  //check to see if there is a student key in session storage. This is for keeping info on which student is checkd it.
   const [currentStudent, setCurrentStudent] = useState(() => {
     const persistParam = window.sessionStorage.getItem("Student");
     return persistParam !== null ? JSON.parse(persistParam) : null;
@@ -76,6 +79,8 @@ const CurrentUserProvider = ({ children }) => {
   ///////////////////////////////////////////////////////////////////////////////
   //  TEACHER FUNCTIONS                                                        //
   ///////////////////////////////////////////////////////////////////////////////
+
+  //if the teacher is checked in, get teacher by email
   useEffect(() => {
     if (user) {
       setLoadingState();
@@ -85,11 +90,12 @@ const CurrentUserProvider = ({ children }) => {
     }
   }, [user]);
 
+  //function that gets teacher from db by email
   const getTeacherByEmail = () => {
     fetch(`/teachers/${user.email}`)
       .then((res) => res.json())
       .then((teacherData) => {
-        const { status, data, message, errorMsg } = teacherData;
+        const { status, data } = teacherData;
         if (status === 201) {
           receiveTeacherDataFromServer(data);
         } else {
@@ -121,7 +127,7 @@ const CurrentUserProvider = ({ children }) => {
     })
       .then((res) => res.json())
       .then((teacherData) => {
-        const { status, data, message, errorMsg } = teacherData;
+        const { status, data } = teacherData;
         if (status === 201) {
           receiveTeacherDataFromServer(data);
         } else {
@@ -139,7 +145,7 @@ const CurrentUserProvider = ({ children }) => {
   //  STUDENT FUNCTIONS                                                        //
   ///////////////////////////////////////////////////////////////////////////////
 
-  //if page is refrenshed grab id from storage and get student info again.
+  //if page is refreshed grab id from storage and get student info again.
   useEffect(() => {
     if (currentStudent) {
       setLoadingState();
@@ -161,20 +167,20 @@ const CurrentUserProvider = ({ children }) => {
     }
   }, []);
 
+  //if currentStudent changes, set the new student id to session storage
   useEffect(() => {
     if (userState.userType === "student") {
       window.sessionStorage.setItem("Student", JSON.stringify(currentStudent));
     }
   }, [currentStudent]);
 
+  //function that gets the classroom by id then sets the library with the info obtained
   const getLibraryFromClassroom = (classroomId) => {
     setLoadingState();
-    console.log("IN getLibraryFromClassroom", typeof classroomId);
 
     fetch(`/classrooms/${classroomId}`)
       .then((res) => res.json())
       .then((classroomData) => {
-        console.log("CLASSROOM", classroomData.data);
         if (classroomData.status === 200) {
           setStudentLibrary(classroomData.data.library_id);
 
@@ -192,12 +198,12 @@ const CurrentUserProvider = ({ children }) => {
       });
   };
 
+  //gets the student's teacher information by the teacher's email.
   const getStudentTeacherByEmail = (teachEmail) => {
-    console.log("IN getStudentTeacherByEmail", teachEmail);
     fetch(`/teachers/${teachEmail}`)
       .then((res) => res.json())
       .then((teacherData) => {
-        const { status, data, message, errorMsg } = teacherData;
+        const { status, data, errorMsg } = teacherData;
         if (status === 201) {
           setStudentTeacher(data);
         } else {
@@ -234,7 +240,6 @@ const CurrentUserProvider = ({ children }) => {
   };
 
   const setStudentLibrary = (library) => {
-    console.log("in setStudent Lib", library);
     dispatch({ type: "SET-STUDENT-LIBRARY", library });
   };
 
@@ -244,7 +249,6 @@ const CurrentUserProvider = ({ children }) => {
 
   //function to change status to ERROR in dispatch
   const receiveErrorFromServer = (error) => {
-    console.log("in context error func");
     dispatch({ type: "ERROR", error });
   };
 

@@ -1,5 +1,6 @@
 const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
 
+//function that returns the book data that was fetched form the google API
 export const getPaginatedSearchResults = (
   searchType,
   searchString,

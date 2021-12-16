@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useReducer, useState } from "react";
 import styled from "styled-components";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useHistory } from "react-router";
-import { getPaginatedSearchResults } from "../../../services/GoogleBooks";
-import Step1Search from "./Step1Search";
+
 import { CurrentUserContext } from "../../context/CurrentUserContext";
 import SuccessModal from "../../SuccessModal";
+import Title from "../../Title";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const initialState = {
   status: "idle",
@@ -31,6 +31,8 @@ const reducer = (state, action) => {
         error: action.message,
         status: "idle",
       };
+    default:
+      throw new Error(`${action.type} is not an action`);
   }
 };
 
@@ -39,18 +41,20 @@ const CreateLibrary = () => {
   const [libName, setLibName] = useState("");
   const [libId, setLibId] = useState("");
   const { user } = useAuth0();
-  const history = useHistory();
   const { getTeacherByEmail } = useContext(CurrentUserContext);
 
+  //when input is typed in, set state libName
   const handleOnChange = (data) => {
     setLibName(data);
   };
 
+  //when the create library button is clicked, run the function libraryNameRequest
   const handleSubmit = (e) => {
     e.preventDefault();
     libraryNameRequest();
   };
 
+  //funciton the runs a POST to create a new library
   const libraryNameRequest = () => {
     dispatch({ type: "LIBRARY-NAME-REQUEST" });
     if (libName === "") {
@@ -87,33 +91,39 @@ const CreateLibrary = () => {
     }
   };
 
+  //function that runs the dispatch if the POST is successfull
   const libraryNameSuccess = () => {
     dispatch({ type: "LIBRARY-NAME-SUCCESSFUL" });
   };
 
+  //function that runs the dispatch if the POST failed
   const libraryNameFailure = (message) => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
 
   return (
-    <>
-      <Title>Create-a-library</Title>
+    <OuterContainer>
+      <Title>Create a library</Title>
       <Container>
         <>
           <p>
             Simply type a name and click "Create Library" to create a library
           </p>
           <FormStyle onSubmit={handleSubmit}>
-            <input
-              type="text"
-              onChange={(e) => handleOnChange(e.target.value)}
-              value={libName}
-              placeholder="Type Library Name..."
-            ></input>
             {state.status === "loading" ? (
-              <div>loading...</div>
+              <LoadingSpinner style={{ marginTop: "50px" }} />
             ) : (
-              <button type="submit">Create Library</button>
+              <>
+                <InputStyle
+                  type="text"
+                  onChange={(e) => handleOnChange(e.target.value)}
+                  value={libName}
+                  placeholder="Type Library Name..."
+                  autoFocus
+                ></InputStyle>
+
+                <Button type="submit">Create Library</Button>
+              </>
             )}
           </FormStyle>
         </>
@@ -126,13 +136,12 @@ const CreateLibrary = () => {
           importedId={libId}
         />
       )}
-    </>
+    </OuterContainer>
   );
 };
 
-const Title = styled.h1`
-  margin-left: 10vw;
-  margin-top: 10px;
+const OuterContainer = styled.div`
+  min-height: calc(100vh - 180px);
 `;
 
 const FormStyle = styled.form`
@@ -142,11 +151,34 @@ const FormStyle = styled.form`
 
 const Container = styled.div`
   max-width: 80vw;
-  /* min-height: 70vh; */
   display: flex;
   flex-direction: column;
   flex: 3;
   margin: 20px auto;
+`;
+
+const InputStyle = styled.input`
+  padding: 5px;
+  width: 400px;
+`;
+
+const Button = styled.button`
+  font-size: 18px;
+  background-color: darkblue;
+  border: none;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin: 0 10px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.03);
+    transition: ease 100ms;
+  }
+  &:active {
+    transform: scale(0.95);
+    transition: ease 100ms;
+  }
 `;
 
 const ErrorDiv = styled.div`
