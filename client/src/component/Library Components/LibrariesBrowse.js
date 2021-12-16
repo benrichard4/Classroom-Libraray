@@ -323,6 +323,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 10px;
+  min-height: calc(100vh - 170px);
 `;
 
 const TopSectionDiv = styled.div`
