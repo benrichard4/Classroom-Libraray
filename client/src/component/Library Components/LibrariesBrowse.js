@@ -14,7 +14,7 @@ const initialState = {
   selectedFilters: [],
   fullLibrary: null,
   filteredLibrary: null,
-  error: null,
+  error: null,   
   sort: "By Title",
   currentPage: 1,
   booksPerPage: 9,

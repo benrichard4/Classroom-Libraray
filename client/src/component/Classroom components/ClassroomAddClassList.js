@@ -52,7 +52,7 @@ const ClassroomAddClassList = () => {
   //when class size changes, run the setTempClassListFunction
   useEffect(() => {
     setTempClassListFunction();
-  }, [classSize]);
+  }, []);
 
   //creates a class list array with object with empty values, ready to be set
   const setTempClassListFunction = () => {
@@ -61,6 +61,20 @@ const ClassroomAddClassList = () => {
       arraySet.push({ givenName: "", surname: "" });
     }
     setTempClassList(arraySet);
+  };
+
+  // useEffect(() => {
+  //   changeTempClassList();
+  // }, [classSize]);
+
+  const changeTempClassList = (action) => {
+    let newArraySet = [...tempClassList];
+    if (action === "add") {
+      newArraySet.push({ givenName: "", surname: "" });
+    } else if (action === "sub" && tempClassList.length >= 10) {
+      newArraySet.pop();
+    }
+    setTempClassList(newArraySet);
   };
 
   //fetch current classroom
@@ -135,6 +149,7 @@ const ClassroomAddClassList = () => {
     dispatch({ type: "REQUEST-FAILURE", message: message });
   };
 
+  console.log("classSize", classSize);
   return currentClassroom === null ? (
     <LoadingSpinner style={{ marginTop: "50px" }} />
   ) : (
@@ -168,16 +183,21 @@ const ClassroomAddClassList = () => {
             })}
             <AddNameContainer>
               <AddRemoveStudentButton
-                onClick={() => {
+                disabled={classSize <= 10}
+                onClick={(e) => {
+                  e.preventDefault();
                   setClassSize(classSize - 1);
+                  changeTempClassList("sub");
                 }}
               >
                 -
               </AddRemoveStudentButton>
               Add/Remove Inputs
               <AddRemoveStudentButton
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setClassSize(classSize + 1);
+                  changeTempClassList("add");
                 }}
               >
                 {" "}
